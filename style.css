@@ -1,0 +1,87 @@
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    padding-top: 20px;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    background-color: #333;
+    color: #fff;
+    padding: 10px 0;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+#userProfile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#userAvatar {
+    display: inline-block;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+#userName {
+    color: #fff;
+    font-size: 20px;
+}
+
+button {
+    background-color: #008cba;
+    color: white;
+    padding: 10px 20px;
+    margin: 10px;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+button:hover {
+    background-color: #005f73;
+}
+
+input[type="text"] {
+    padding: 10px;
+    margin: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    width: calc(50% - 22px);
+}
+
+#userRegistration {
+    background-color: #fff;
+    padding: 20px;
+    margin-top: 80px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border-radius: 10px;
+}
+
+#walletAddress, #walletBalance {
+    background-color: #fff;
+    color: #333;
+    margin: 20px auto;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    width: fit-content;
+}
+
+#walletAddress {
+    margin-bottom: 0;
+}
+
+#walletBalance {
+    margin-top: 5px;
+}
