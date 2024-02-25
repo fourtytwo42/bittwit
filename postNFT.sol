@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
-import "./accounts.sol"; 
+import "./distTwitter.sol"; // Ensure this path matches your project structure
 
 contract PostNFT is ERC721, Ownable {
     using Counters for Counters.Counter;
@@ -15,7 +15,8 @@ contract PostNFT is ERC721, Ownable {
         address author;
         string textLink;
         string imageLink;
-        string promptLink; 
+        string promptLink;
+        uint256 createdAt; // Timestamp of post creation
     }
 
     mapping(uint256 => Post) private posts;
@@ -23,7 +24,7 @@ contract PostNFT is ERC721, Ownable {
 
     UserManagement private userManagement;
 
-    event PostCreated(uint256 indexed postId, address indexed author, string textLink, string imageLink, string promptLink);
+    event PostCreated(uint256 indexed postId, address indexed author, string textLink, string imageLink, string promptLink, uint256 createdAt);
 
     constructor(address userManagementAddress) ERC721("PostNFT", "PNFT") Ownable(msg.sender) {
         userManagement = UserManagement(userManagementAddress);
@@ -43,13 +44,14 @@ contract PostNFT is ERC721, Ownable {
             author: msg.sender,
             textLink: textLink,
             imageLink: imageLink,
-            promptLink: promptLink 
+            promptLink: promptLink,
+            createdAt: block.timestamp // Assign current block timestamp
         });
 
         postsByAuthor[msg.sender].push(newPostId);
 
         _mint(msg.sender, newPostId);
-        emit PostCreated(newPostId, msg.sender, textLink, imageLink, promptLink);
+        emit PostCreated(newPostId, msg.sender, textLink, imageLink, promptLink, block.timestamp);
     }
 
     function getPost(uint256 postId) public view returns (Post memory) {
