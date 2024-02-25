@@ -832,21 +832,19 @@ async function handlePostSubmission(event) {
     const imagePromptElement = document.getElementById('imagePrompt');
 
     let imageLink = '';
+
     if (imageOption === 'upload' && imageUploadElement.files.length > 0) {
-        // Assume uploadImage returns the URL of the uploaded image
-        imageLink = await uploadImage(imageUploadElement.files[0]);
+        const file = imageUploadElement.files[0];
+        imageLink = await uploadToIPFS(file); // Upload the selected file to IPFS
     } else if (imageOption === 'generate') {
-        // Assume generateImage returns the URL of the generated image based on the prompt
-        imageLink = await generateImage(imagePromptElement.value);
+        const imageBlob = await generateImageBlob(imagePromptElement.value); // Use modified generateImage function
+        imageLink = await uploadToIPFS(imageBlob); // Upload the generated image Blob to IPFS
     }
 
-    // Assuming postText is the URL to the text content or directly the text content
-    // You need to handle how you want to convert postText into a link if required
-    const textLink = postText; // This could also be a call to upload text to a storage service and get a link back
-    const promptLink = imagePromptElement.value; // Using the prompt directly, adjust as needed
-
-    await createPost(textLink, imageLink, promptLink);
+    // Proceed with the rest of your post creation logic here...
 }
+
+
 
 function handleImageOptionChange() {
     const uploadInput = document.getElementById('imageUpload');
@@ -918,7 +916,7 @@ document.getElementById('generateButton').addEventListener('click', async () => 
 
     if (desc) {
         try {
-            const imageURL = await generateImage(desc);
+            const imageURL = await generateImageBlob(desc);
             document.getElementById('imagePreview').src = imageURL;
         } catch (error) {
             console.error("Failed to generate image:", error);
@@ -934,45 +932,68 @@ document.getElementById('generateButton').addEventListener('click', async () => 
 
 });
 
-async function generateImage(desc) {
-    const hfApiKey = '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'; // Replace with your actual API key
+async function generateImageBlob(desc, retries = 3, delay = 1000) {
+    const hfApiKey = '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';
 
-    try {
-        const response = await fetch(
-            "https://api-inference.huggingface.co/models/prompthero/openjourney-v4",
-            {
-                headers: { 
-                    'Authorization': `Bearer ${hfApiKey}`
-                },
-                method: "POST",
-                body: JSON.stringify({ inputs: desc }),
+    for (let i = 0; i < retries; i++) {
+        try {
+            const response = await fetch(
+                "https://api-inference.huggingface.co/models/prompthero/openjourney-v4",
+                {
+                    method: "POST",
+                    headers: {
+                        'Authorization': `Bearer ${hfApiKey}`,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ inputs: desc }),
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
-        );
 
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            return await response.blob();
+        } catch (error) {
+            console.error(`Attempt ${i + 1} failed:`, error);
+
+            if (i === retries - 1) throw error; // Throw error on last attempt
+
+            await new Promise(resolve => setTimeout(resolve, delay));
+            delay *= 2; // Exponential backoff
         }
-
-        const blob = await response.blob();
-        return URL.createObjectURL(blob);
-    } catch (error) {
-        console.error("Error in generateImage:", error);
-        throw error;
     }
 }
 
-function handleImageOptionChange() {
-    const imagePrompt = document.getElementById('imagePrompt');
-    const generateButton = document.getElementById('generateButton');
-    const imageUpload = document.getElementById('imageUpload');
 
-    if (document.getElementById('generateImage').checked) {
-        imagePrompt.style.display = 'block';
-        generateButton.style.display = 'block';
-        imageUpload.style.display = 'none';
-    } else {
-        imagePrompt.style.display = 'none';
-        generateButton.style.display = 'none';
-        imageUpload.style.display = 'block';
+
+
+async function uploadToIPFS(file) {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const apiKey = '60f452a5a3f00328e4ad'; // Replace with your actual API key
+    const apiSecret = 'c84f6655a0b318a7ea8a3b86717c2150e3fd99836ae4a80863ba8c788d15dcd4'; // Replace with your actual API secret
+
+    try {
+        const response = await fetch('https://api.pinata.cloud/pinning/pinFileToIPFS', { // Make sure this URL is correct
+            method: 'POST',
+            headers: {
+                'pinata_api_key': apiKey,
+                'pinata_secret_api_key': apiSecret
+            },
+            body: formData,
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            // The response format depends on Pinata's API, you might need to adjust the following line
+            return `https://gateway.pinata.cloud/ipfs/${data.IpfsHash}`; // Adjust based on your response and preferred IPFS gateway
+        } else {
+            throw new Error(`Failed to upload to IPFS via Pinata: ${response.statusText}`);
+        }
+    } catch (error) {
+        console.error('Error uploading to IPFS via Pinata:', error);
+        throw error;
     }
 }
