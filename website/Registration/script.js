@@ -9,6 +9,7 @@ const isERC1155Input = document.querySelector('#isERC1155Input');
 const avatarAmountInput = document.querySelector('#avatarAmountInput');
 const userRegistrationSection = document.querySelector('#userRegistration');
 
+
 let selectedAccount;
 let userContract;
 
@@ -314,39 +315,55 @@ const contractABI = [
 ];
 const contractAddress = '0x27F92240a258a1f4e5Ee0471B502e2d1b1D28FEd';
 
-window.addEventListener('load', () => {
-    if (window.ethereum) {
-        ethereum.request({ method: 'eth_accounts' })
-        .then(handleAccountsChanged)
-        .catch((err) => {
-            console.error('Error fetching accounts:', err);
+document.addEventListener('DOMContentLoaded', () => {
+    init();
+});
+
+async function init() {
+    if (typeof window.ethereum !== 'undefined') {
+        try {
+            const accounts = await ethereum.request({ method: 'eth_accounts' });
+            if (accounts.length > 0) {
+                // MetaMask is already connected
+                selectedAccount = accounts[0];
+                console.log(`Found connected account: ${selectedAccount}`);
+                ethereumButton.innerText = 'Connected';
+                initContract();
+                await checkUserRegistration();
+            } else {
+                // MetaMask is not connected or the user has not connected any accounts
+                console.log('MetaMask is installed but not connected');
+            }
+        } catch (error) {
+            console.error('Error checking MetaMask connection:', error);
+        }
+
+        ethereum.on('accountsChanged', async (accounts) => {
+            if (accounts.length > 0) {
+                selectedAccount = accounts[0];
+                console.log(`Account changed to: ${selectedAccount}`);
+                initContract();
+                await checkUserRegistration();
+            }
         });
     } else {
         console.error('MetaMask is not installed!');
     }
-});
 
-ethereumButton.addEventListener('click', () => {
-    connectToMetaMask();
-});
-
-function handleAccountsChanged(accounts) {
-    if (accounts.length === 0) {
-        console.log('Please connect to MetaMask.');
-    } else {
-        selectedAccount = accounts[0];
-        console.log(`Found an authorized account: ${selectedAccount}`);
-        ethereumButton.innerText = 'Connected';
-        initContract();
-        checkUserRegistration();
-    }
+    ethereumButton.addEventListener('click', () => {
+        connectToMetaMask();
+    });
 }
 
 async function connectToMetaMask() {
     if (typeof window.ethereum !== 'undefined') {
         try {
             const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-            handleAccountsChanged(accounts);
+            selectedAccount = accounts[0];
+            console.log(`Connected to account: ${selectedAccount}`);
+            ethereumButton.innerText = 'Connected';
+            initContract();
+            await checkUserRegistration();
         } catch (error) {
             console.error('Error during account request:', error);
         }
@@ -359,29 +376,27 @@ function initContract() {
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const signer = provider.getSigner();
     userContract = new ethers.Contract(contractAddress, contractABI, signer);
-    checkUserRegistration();
 }
 
 async function checkUserRegistration() {
     try {
         const userInfo = await userContract.getUserInfo(selectedAccount);
+        console.log(selectedAccount);
         if (userInfo && userInfo.username) {
             userName.innerText = userInfo.username;
-            userAvatar.src = 'PATH_OR_METHOD_TO_RESOLVE_NFT_IMAGE'; // Properly replace this with actual image resolution logic
-            console.log(`User ${userInfo.username} is already registered.`);
-        } else {
-            console.log('User is not registered.');
+            userAvatar.src = 'PATH_OR_METHOD_TO_RESOLVE_NFT_IMAGE';
         }
     } catch (error) {
         console.error('Error fetching user info:', error);
     }
 }
+
 registerUserButton.addEventListener('click', async () => {
     const username = usernameInput.value.trim();
     const avatarContract = avatarContractInput.value.trim();
     const avatarTokenId = avatarTokenIdInput.value.trim();
     const isERC1155 = isERC1155Input.checked;
-    const avatarAmount = 1;
+    const avatarAmount = avatarAmountInput.value.trim();
 
     if (!username || !avatarContract || !avatarTokenId) {
         alert('Username, Avatar Contract, and Avatar Token ID are required');
@@ -390,23 +405,9 @@ registerUserButton.addEventListener('click', async () => {
     try {
         await userContract.registerUser(username, avatarContract, avatarTokenId, isERC1155, avatarAmount);
         userName.innerText = username;
-        // NFT to image URL resolution is handled elsewhere
-        userAvatar.src = 'PATH_OR_METHOD_TO_RESOLVE_NFT_IMAGE'; // Update this line accordingly
+        userAvatar.src = 'PATH_OR_METHOD_TO_RESOLVE_NFT_IMAGE';
         console.log('User registered/updated successfully');
     } catch (error) {
         console.error('Error registering/updating user:', error);
     }
 });
-
-// Call this function wherever you need to update the user's avatar
-async function updateAvatar(avatarContract, avatarTokenId, isERC1155, avatarAmount) {
-    try {
-        await userContract.updateAvatar(avatarContract, avatarTokenId, isERC1155, avatarAmount);
-        // resolve the NFT to an image URL after updating
-        userAvatar.src = 'PATH_OR_METHOD_TO_RESOLVE_NFT_IMAGE'; // Update this line accordingly
-        console.log('Avatar updated successfully');
-    } catch (error) {
-        console.error('Error updating avatar:', error);
-    }
-}
-
