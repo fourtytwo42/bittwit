@@ -313,7 +313,7 @@ const contractABI = [
 		"type": "function"
 	}
 ];
-const contractAddress = '0xfD0402372b66d80475f7C9535885277779d0CdC3';
+const contractAddress = '0x27F92240a258a1f4e5Ee0471B502e2d1b1D28FEd';
 
 ethereumButton.addEventListener('click', () => {
     connectToMetaMask();
