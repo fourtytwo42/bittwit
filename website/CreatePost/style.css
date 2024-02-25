@@ -26,87 +26,65 @@ header {
 }
 
 #userAvatar {
-    width: 35px; /* Smaller avatar */
-    height: 35px;
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
     object-fit: cover;
 }
 
 #userName {
     color: #fff;
-    font-size: 16px; /* Slightly smaller font */
+    font-size: 16px;
 }
 
 button {
     background-color: #008cba;
     color: white;
-    padding: 8px 16px; /* Slightly smaller buttons */
+    padding: 8px 16px;
     margin: 10px;
     border: none;
     cursor: pointer;
-    font-size: 14px; /* Smaller font size for buttons */
+    font-size: 14px;
 }
 
 button:hover {
     background-color: #005f73;
 }
 
-#postSection {
+#contentArea {
+    display: flex;
+    justify-content: center;
+    margin-top: 80px; /* Adjust for header height */
+    width: 70%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#leftContainer, #rightContainer {
+    width: 50%;
     padding: 20px;
-    margin-top: 70px; /* Adjusted for the smaller header */
 }
 
 #postForm {
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    max-width: 90%; /* Limit form width for better mobile appearance */
-    margin: auto; /* Center form on page */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 #postText, #imagePrompt, #imageUpload {
-    width: 100%; /* Full width of the form */
-    max-width: 300px; /* Maximum width to not exceed half of typical page width */
-    padding: 8px;
+    width: 90%;
     margin-bottom: 10px;
+    padding: 8px;
     border-radius: 5px;
     border: 1px solid #ccc;
-    resize: vertical;
-}
-
-#imageOption {
-    margin: 10px 0;
-}
-
-button[type="submit"] {
-    width: 50%; /* Smaller submit button */
-    padding: 10px;
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 14px; /* Smaller font size */
-    margin: auto; /* Center button */
-}
-
-button[type="submit"]:hover {
-    background-color: #45a049;
-}
-
-#imagePreviewContainer {
-    display: flex;
-    justify-content: center; /* Center horizontally */
-    align-items: center; /* Center vertically */
-    margin-top: 10px;
-    padding: 10px; /* Added padding */
-    border: 1px solid #ccc; /* Visual clarity */
-    background-color: #f9f9f9; /* Visual clarity */
 }
 
 #imagePreview {
-    max-width: 256px; /* Smaller image */
-    max-height: 256px; /* Keep aspect ratio */
-    display: block;
+    width: 100%;
+    max-height: 300px; /* Adjust based on your preference */
+    object-fit: contain;
+}
+
+#imageOption, #postButton, #generateButton {
+    margin-top: 10px;
 }

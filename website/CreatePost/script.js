@@ -857,14 +857,18 @@ async function handlePostSubmission(event) {
 function handleImageOptionChange() {
     const uploadInput = document.getElementById('imageUpload');
     const promptInput = document.getElementById('imagePrompt');
+    const generateButton = document.getElementById('generateButton');
     if (document.getElementById('uploadImage').checked) {
         uploadInput.style.display = 'block';
         promptInput.style.display = 'none';
+        generateButton.style.display = 'none';
     } else {
         uploadInput.style.display = 'none';
         promptInput.style.display = 'block';
+        generateButton.style.display = 'block';
     }
 }
+
 
 // Mock function to simulate image upload
 async function uploadImage(file) {
@@ -875,12 +879,16 @@ async function uploadImage(file) {
 }
 
 // Mock function to simulate image generation from prompt
-async function generateImage(prompt) {
-    // You need to implement this function to generate an image based on the prompt and return the URL
-    console.log('Generating image from prompt...');
-    // Return a placeholder or the actual URL after generation
-    return 'https://example.com/generated_image.jpg';
-}
+document.getElementById('generateButton').addEventListener('click', async function() {
+    const prompt = document.getElementById('imagePrompt').value;
+    if (prompt) {
+        // Assuming `generateImage` is your function to call an API or generate an image based on the prompt
+        const imageUrl = await generateImage(prompt);
+        document.getElementById('imagePreview').src = imageUrl;
+        document.getElementById('imagePreview').style.display = 'block';
+    }
+});
+
 
 document.getElementById('imageUpload').addEventListener('change', function(event) {
     const [file] = event.target.files;
@@ -894,6 +902,7 @@ document.getElementById('imageUpload').addEventListener('change', function(event
         reader.readAsDataURL(file); // Read the file as a Data URL to display it
     }
 });
+
 
 document.getElementById('generateImage').addEventListener('change', function() {
     document.getElementById('generateButton').textContent = 'Generate';
