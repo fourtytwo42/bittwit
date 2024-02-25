@@ -822,13 +822,7 @@ async function createPost(textLink, imageLink, promptLink) {
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    init();
-    document.getElementById('postForm').addEventListener('submit', handlePostSubmission);
-    document.getElementsByName('imageOption').forEach(radio => {
-        radio.addEventListener('change', handleImageOptionChange);
-    });
-});
+
 
 async function handlePostSubmission(event) {
     event.preventDefault();
@@ -878,16 +872,7 @@ async function uploadImage(file) {
     return 'https://example.com/uploaded_image.jpg';
 }
 
-// Mock function to simulate image generation from prompt
-document.getElementById('generateButton').addEventListener('click', async function() {
-    const prompt = document.getElementById('imagePrompt').value;
-    if (prompt) {
-        // Assuming `generateImage` is your function to call an API or generate an image based on the prompt
-        const imageUrl = await generateImage(prompt);
-        document.getElementById('imagePreview').src = imageUrl;
-        document.getElementById('imagePreview').style.display = 'block';
-    }
-});
+
 
 
 document.getElementById('imageUpload').addEventListener('change', function(event) {
@@ -912,3 +897,82 @@ document.getElementById('generateButton').addEventListener('click', function() {
     this.textContent = 'Regenerate';
     // Implement the logic for generating an image based on the prompt
 });
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Initial setup if needed
+    init();
+
+    // Handle form submission
+    document.getElementById('postForm').addEventListener('submit', handlePostSubmission);
+
+    // Toggle visibility of prompt input and generate button based on selected image option
+    document.getElementsByName('imageOption').forEach(radio => {
+        radio.addEventListener('change', handleImageOptionChange);
+    });
+
+    // Generate image when the generate button is clicked
+document.getElementById('generateButton').addEventListener('click', async () => {
+    const desc = document.getElementById('imagePrompt').value.trim();
+    const generateButton = document.getElementById('generateButton');
+    generateButton.disabled = true; // Disable the button to prevent multiple clicks
+
+    if (desc) {
+        try {
+            const imageURL = await generateImage(desc);
+            document.getElementById('imagePreview').src = imageURL;
+        } catch (error) {
+            console.error("Failed to generate image:", error);
+            // Optionally, inform the user to enter a prompt
+        } finally {
+            generateButton.disabled = false; // Re-enable the button after the process is complete
+        }
+    } else {
+        console.log('Please enter a prompt for the image.');
+        generateButton.disabled = false; // Re-enable the button if there's no description
+    }
+});
+
+});
+
+async function generateImage(desc) {
+    const hfApiKey = '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'; // Replace with your actual API key
+
+    try {
+        const response = await fetch(
+            "https://api-inference.huggingface.co/models/prompthero/openjourney-v4",
+            {
+                headers: { 
+                    'Authorization': `Bearer ${hfApiKey}`
+                },
+                method: "POST",
+                body: JSON.stringify({ inputs: desc }),
+            }
+        );
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const blob = await response.blob();
+        return URL.createObjectURL(blob);
+    } catch (error) {
+        console.error("Error in generateImage:", error);
+        throw error;
+    }
+}
+
+function handleImageOptionChange() {
+    const imagePrompt = document.getElementById('imagePrompt');
+    const generateButton = document.getElementById('generateButton');
+    const imageUpload = document.getElementById('imageUpload');
+
+    if (document.getElementById('generateImage').checked) {
+        imagePrompt.style.display = 'block';
+        generateButton.style.display = 'block';
+        imageUpload.style.display = 'none';
+    } else {
+        imagePrompt.style.display = 'none';
+        generateButton.style.display = 'none';
+        imageUpload.style.display = 'block';
+    }
+}
