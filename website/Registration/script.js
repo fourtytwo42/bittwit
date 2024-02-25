@@ -348,9 +348,6 @@ async function checkUserRegistration() {
             userName.innerText = userInfo.username;
             // Here, you might need to convert NFT data into an image URL. This example assumes it's already handled elsewhere.
             userAvatar.src = 'PATH_OR_METHOD_TO_RESOLVE_NFT_IMAGE'; // Update this line accordingly
-            userRegistrationSection.style.display = 'none';
-        } else {
-            userRegistrationSection.style.display = 'block';
         }
     } catch (error) {
         console.error('Error fetching user info:', error);
@@ -362,7 +359,7 @@ registerUserButton.addEventListener('click', async () => {
     const avatarContract = avatarContractInput.value.trim();
     const avatarTokenId = avatarTokenIdInput.value.trim();
     const isERC1155 = isERC1155Input.checked;
-    const avatarAmount = avatarAmountInput.value.trim();
+    const avatarAmount = 1;
 
     if (!username || !avatarContract || !avatarTokenId) {
         alert('Username, Avatar Contract, and Avatar Token ID are required');
