@@ -734,10 +734,37 @@ const registerUserButton = document.querySelector('#registerUserButton');
 const userAvatar = document.querySelector('#userAvatar');
 const userName = document.querySelector('#userName');
 let selectedAccount;
-let userContract;
+let userContract, postNftContract;
 
 document.addEventListener('DOMContentLoaded', () => {
     init();
+
+    document.getElementById('postForm').addEventListener('submit', handlePostSubmission);
+
+    document.getElementsByName('imageOption').forEach(radio => {
+        radio.addEventListener('change', handleImageOptionChange);
+    });
+
+    document.getElementById('generateButton').addEventListener('click', async () => {
+        const desc = document.getElementById('imagePrompt').value.trim();
+        const generateButton = document.getElementById('generateButton');
+        generateButton.disabled = true;
+
+        if (desc) {
+            try {
+                const imageBlob = await generateImageBlob(desc);
+                const imageURL = await uploadToIPFS(imageBlob);
+                document.getElementById('imagePreview').src = imageURL;
+            } catch (error) {
+                console.error("Failed to generate image:", error);
+            } finally {
+                generateButton.disabled = false;
+            }
+        } else {
+            console.log('Please enter a prompt for the image.');
+            generateButton.disabled = false;
+        }
+    });
 });
 
 async function init() {
@@ -811,19 +838,6 @@ async function checkUserRegistration() {
     }
 }
 
-// Function to call createPost in the PostNFT contract
-async function createPost(textLink, imageLink, promptLink) {
-    try {
-        const tx = await postNftContract.createPost(textLink, imageLink, promptLink);
-        await tx.wait();
-        console.log('Post created successfully');
-    } catch (error) {
-        console.error('Error creating post:', error);
-    }
-}
-
-
-
 async function handlePostSubmission(event) {
     event.preventDefault();
     const postText = document.getElementById('postText').value;
@@ -835,16 +849,29 @@ async function handlePostSubmission(event) {
 
     if (imageOption === 'upload' && imageUploadElement.files.length > 0) {
         const file = imageUploadElement.files[0];
-        imageLink = await uploadToIPFS(file); // Upload the selected file to IPFS
+        imageLink = await uploadToIPFS(file);
     } else if (imageOption === 'generate') {
-        const imageBlob = await generateImageBlob(imagePromptElement.value); // Use modified generateImage function
-        imageLink = await uploadToIPFS(imageBlob); // Upload the generated image Blob to IPFS
+        const desc = imagePromptElement.value.trim();
+        if (desc) {
+            const imageBlob = await generateImageBlob(desc);
+            imageLink = await uploadToIPFS(imageBlob);
+        }
     }
 
-    // Proceed with the rest of your post creation logic here...
+    if (imageLink && postText) {
+        await createPost(postText, imageLink, imagePromptElement.value.trim());
+    }
 }
 
-
+async function createPost(textLink, imageLink, promptLink) {
+    try {
+        const tx = await postNftContract.createPost(textLink, imageLink, promptLink);
+        await tx.wait();
+        console.log('Post created successfully');
+    } catch (error) {
+        console.error('Error creating post:', error);
+    }
+}
 
 function handleImageOptionChange() {
     const uploadInput = document.getElementById('imageUpload');
@@ -861,18 +888,6 @@ function handleImageOptionChange() {
     }
 }
 
-
-// Mock function to simulate image upload
-async function uploadImage(file) {
-    // You need to implement this function to upload the image file and return the URL
-    console.log('Uploading image...');
-    // Return a placeholder or the actual URL after upload
-    return 'https://example.com/uploaded_image.jpg';
-}
-
-
-
-
 document.getElementById('imageUpload').addEventListener('change', function(event) {
     const [file] = event.target.files;
     if (file) {
@@ -880,56 +895,10 @@ document.getElementById('imageUpload').addEventListener('change', function(event
         reader.onload = function(e) {
             const imagePreview = document.getElementById('imagePreview');
             imagePreview.src = e.target.result;
-            imagePreview.style.display = 'block'; // Show the image preview
+            imagePreview.style.display = 'block';
         };
-        reader.readAsDataURL(file); // Read the file as a Data URL to display it
+        reader.readAsDataURL(file);
     }
-});
-
-
-document.getElementById('generateImage').addEventListener('change', function() {
-    document.getElementById('generateButton').textContent = 'Generate';
-});
-
-document.getElementById('generateButton').addEventListener('click', function() {
-    this.textContent = 'Regenerate';
-    // Implement the logic for generating an image based on the prompt
-});
-
-document.addEventListener('DOMContentLoaded', () => {
-    // Initial setup if needed
-    init();
-
-    // Handle form submission
-    document.getElementById('postForm').addEventListener('submit', handlePostSubmission);
-
-    // Toggle visibility of prompt input and generate button based on selected image option
-    document.getElementsByName('imageOption').forEach(radio => {
-        radio.addEventListener('change', handleImageOptionChange);
-    });
-
-    // Generate image when the generate button is clicked
-document.getElementById('generateButton').addEventListener('click', async () => {
-    const desc = document.getElementById('imagePrompt').value.trim();
-    const generateButton = document.getElementById('generateButton');
-    generateButton.disabled = true; // Disable the button to prevent multiple clicks
-
-    if (desc) {
-        try {
-            const imageURL = await generateImageBlob(desc);
-            document.getElementById('imagePreview').src = imageURL;
-        } catch (error) {
-            console.error("Failed to generate image:", error);
-            // Optionally, inform the user to enter a prompt
-        } finally {
-            generateButton.disabled = false; // Re-enable the button after the process is complete
-        }
-    } else {
-        console.log('Please enter a prompt for the image.');
-        generateButton.disabled = false; // Re-enable the button if there's no description
-    }
-});
-
 });
 
 async function generateImageBlob(desc, retries = 3, delay = 1000) {
@@ -957,26 +926,23 @@ async function generateImageBlob(desc, retries = 3, delay = 1000) {
         } catch (error) {
             console.error(`Attempt ${i + 1} failed:`, error);
 
-            if (i === retries - 1) throw error; // Throw error on last attempt
+            if (i === retries - 1) throw error;
 
             await new Promise(resolve => setTimeout(resolve, delay));
-            delay *= 2; // Exponential backoff
+            delay *= 2;
         }
     }
 }
-
-
-
 
 async function uploadToIPFS(file) {
     const formData = new FormData();
     formData.append("file", file);
 
-    const apiKey = '60f452a5a3f00328e4ad'; // Replace with your actual API key
-    const apiSecret = 'c84f6655a0b318a7ea8a3b86717c2150e3fd99836ae4a80863ba8c788d15dcd4'; // Replace with your actual API secret
+    const apiKey = '60f452a5a3f00328e4ad';
+    const apiSecret = 'c84f6655a0b318a7ea8a3b86717c2150e3fd99836ae4a80863ba8c788d15dcd4';
 
     try {
-        const response = await fetch('https://api.pinata.cloud/pinning/pinFileToIPFS', { // Make sure this URL is correct
+        const response = await fetch('https://api.pinata.cloud/pinning/pinFileToIPFS', {
             method: 'POST',
             headers: {
                 'pinata_api_key': apiKey,
@@ -987,8 +953,7 @@ async function uploadToIPFS(file) {
 
         if (response.ok) {
             const data = await response.json();
-            // The response format depends on Pinata's API, you might need to adjust the following line
-            return `https://gateway.pinata.cloud/ipfs/${data.IpfsHash}`; // Adjust based on your response and preferred IPFS gateway
+            return `https://gateway.pinata.cloud/ipfs/${data.IpfsHash}`;
         } else {
             throw new Error(`Failed to upload to IPFS via Pinata: ${response.statusText}`);
         }
