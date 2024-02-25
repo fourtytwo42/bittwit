@@ -396,7 +396,7 @@ registerUserButton.addEventListener('click', async () => {
     const avatarContract = avatarContractInput.value.trim();
     const avatarTokenId = avatarTokenIdInput.value.trim();
     const isERC1155 = isERC1155Input.checked;
-    const avatarAmount = avatarAmountInput.value.trim();
+    const avatarAmount = 1;
 
     if (!username || !avatarContract || !avatarTokenId) {
         alert('Username, Avatar Contract, and Avatar Token ID are required');
