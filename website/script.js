@@ -12,7 +12,6 @@ const userRegistrationSection = document.querySelector('#userRegistration');
 let selectedAccount;
 let userContract;
 
-// ABI and Contract Address need to be populated with actual data
 const contractABI = [
 	{
 		"inputs": [],
@@ -372,7 +371,7 @@ registerUserButton.addEventListener('click', async () => {
     try {
         await userContract.registerUser(username, avatarContract, avatarTokenId, isERC1155, avatarAmount);
         userName.innerText = username;
-        // Again, assuming NFT to image URL resolution is handled elsewhere
+        // NFT to image URL resolution is handled elsewhere
         userAvatar.src = 'PATH_OR_METHOD_TO_RESOLVE_NFT_IMAGE'; // Update this line accordingly
         console.log('User registered/updated successfully');
     } catch (error) {
@@ -384,7 +383,7 @@ registerUserButton.addEventListener('click', async () => {
 async function updateAvatar(avatarContract, avatarTokenId, isERC1155, avatarAmount) {
     try {
         await userContract.updateAvatar(avatarContract, avatarTokenId, isERC1155, avatarAmount);
-        // You'll need to resolve the NFT to an image URL after updating
+        // resolve the NFT to an image URL after updating
         userAvatar.src = 'PATH_OR_METHOD_TO_RESOLVE_NFT_IMAGE'; // Update this line accordingly
         console.log('Avatar updated successfully');
     } catch (error) {
