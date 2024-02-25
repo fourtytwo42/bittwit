@@ -314,19 +314,39 @@ const contractABI = [
 ];
 const contractAddress = '0x27F92240a258a1f4e5Ee0471B502e2d1b1D28FEd';
 
+window.addEventListener('load', () => {
+    if (window.ethereum) {
+        ethereum.request({ method: 'eth_accounts' })
+        .then(handleAccountsChanged)
+        .catch((err) => {
+            console.error('Error fetching accounts:', err);
+        });
+    } else {
+        console.error('MetaMask is not installed!');
+    }
+});
+
 ethereumButton.addEventListener('click', () => {
     connectToMetaMask();
 });
+
+function handleAccountsChanged(accounts) {
+    if (accounts.length === 0) {
+        console.log('Please connect to MetaMask.');
+    } else {
+        selectedAccount = accounts[0];
+        console.log(`Found an authorized account: ${selectedAccount}`);
+        ethereumButton.innerText = 'Connected';
+        initContract();
+        checkUserRegistration();
+    }
+}
 
 async function connectToMetaMask() {
     if (typeof window.ethereum !== 'undefined') {
         try {
             const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-            selectedAccount = accounts[0];
-            console.log(`Connected to account: ${selectedAccount}`);
-            ethereumButton.innerText = 'Connected';
-            initContract();
-            checkUserRegistration();
+            handleAccountsChanged(accounts);
         } catch (error) {
             console.error('Error during account request:', error);
         }
@@ -339,6 +359,7 @@ function initContract() {
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const signer = provider.getSigner();
     userContract = new ethers.Contract(contractAddress, contractABI, signer);
+    checkUserRegistration();
 }
 
 async function checkUserRegistration() {
@@ -346,14 +367,15 @@ async function checkUserRegistration() {
         const userInfo = await userContract.getUserInfo(selectedAccount);
         if (userInfo && userInfo.username) {
             userName.innerText = userInfo.username;
-            // Here, you might need to convert NFT data into an image URL. This example assumes it's already handled elsewhere.
-            userAvatar.src = 'PATH_OR_METHOD_TO_RESOLVE_NFT_IMAGE'; // Update this line accordingly
+            userAvatar.src = 'PATH_OR_METHOD_TO_RESOLVE_NFT_IMAGE'; // Properly replace this with actual image resolution logic
+            console.log(`User ${userInfo.username} is already registered.`);
+        } else {
+            console.log('User is not registered.');
         }
     } catch (error) {
         console.error('Error fetching user info:', error);
     }
 }
-
 registerUserButton.addEventListener('click', async () => {
     const username = usernameInput.value.trim();
     const avatarContract = avatarContractInput.value.trim();
