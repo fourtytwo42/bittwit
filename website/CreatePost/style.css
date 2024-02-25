@@ -26,62 +26,87 @@ header {
 }
 
 #userAvatar {
-    display: inline-block;
-    width: 50px;
-    height: 50px;
+    width: 35px; /* Smaller avatar */
+    height: 35px;
     border-radius: 50%;
     object-fit: cover;
 }
 
 #userName {
     color: #fff;
-    font-size: 20px;
+    font-size: 16px; /* Slightly smaller font */
 }
 
 button {
     background-color: #008cba;
     color: white;
-    padding: 10px 20px;
+    padding: 8px 16px; /* Slightly smaller buttons */
     margin: 10px;
     border: none;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 14px; /* Smaller font size for buttons */
 }
 
 button:hover {
     background-color: #005f73;
 }
 
-input[type="text"] {
-    padding: 10px;
-    margin: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    width: calc(50% - 22px);
+#postSection {
+    padding: 20px;
+    margin-top: 70px; /* Adjusted for the smaller header */
 }
 
-#userRegistration {
+#postForm {
     background-color: #fff;
     padding: 20px;
-    margin-top: 80px;
+    border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    border-radius: 10px;
+    max-width: 90%; /* Limit form width for better mobile appearance */
+    margin: auto; /* Center form on page */
 }
 
-#walletAddress, #walletBalance {
-    background-color: #fff;
-    color: #333;
-    margin: 20px auto;
-    padding: 10px;
+#postText, #imagePrompt, #imageUpload {
+    width: 100%; /* Full width of the form */
+    max-width: 300px; /* Maximum width to not exceed half of typical page width */
+    padding: 8px;
+    margin-bottom: 10px;
     border-radius: 5px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    width: fit-content;
+    border: 1px solid #ccc;
+    resize: vertical;
 }
 
-#walletAddress {
-    margin-bottom: 0;
+#imageOption {
+    margin: 10px 0;
 }
 
-#walletBalance {
-    margin-top: 5px;
+button[type="submit"] {
+    width: 50%; /* Smaller submit button */
+    padding: 10px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px; /* Smaller font size */
+    margin: auto; /* Center button */
+}
+
+button[type="submit"]:hover {
+    background-color: #45a049;
+}
+
+#imagePreviewContainer {
+    display: flex;
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically */
+    margin-top: 10px;
+    padding: 10px; /* Added padding */
+    border: 1px solid #ccc; /* Visual clarity */
+    background-color: #f9f9f9; /* Visual clarity */
+}
+
+#imagePreview {
+    max-width: 256px; /* Smaller image */
+    max-height: 256px; /* Keep aspect ratio */
+    display: block;
 }
