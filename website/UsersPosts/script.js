@@ -823,14 +823,24 @@ async function displayUserPosts(address) {
 
 function addPostToFeed(post) {
     const postElement = document.createElement('article');
-    postElement.innerHTML = `
-        <p>Posted on: ${new Date(post.createdAt * 1000).toLocaleString()}</p>
-        <p><a>${post.textLink}</a></p>
-        <p>Image: <a href="${post.imageLink}" target="_blank">View Image</a></p>
-        <p>Prompt: <a href="${post.promptLink}" target="_blank">View Prompt</a></p>
+    postElement.classList.add('post-container'); // Ensures consistency with CSS styling
+
+    let innerHTMLContent = `
+        <div class="post-content">
+            <p class="post-timestamp">Posted on: ${new Date(post.createdAt * 1000).toLocaleString()}</p>
+            <p class="post-text"><a>${post.textLink}</a></p>
+            ${post.promptLink !== "" ? `<p class="post-prompt"><a>Prompt: ${post.promptLink}</a></p>` : ''}
+        </div>
+        <div class="post-image">
+            <a><img src="${post.imageLink}" ></a>
+        </div>
     `;
+
+    postElement.innerHTML = innerHTMLContent;
     postFeed.appendChild(postElement);
 }
+
+
 
 function getAddressFromURL() {
     const urlParams = new URLSearchParams(window.location.search);
