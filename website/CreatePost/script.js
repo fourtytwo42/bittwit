@@ -839,11 +839,14 @@ document.getElementById('imageUpload').addEventListener('change', function(event
     }
 });
 
+// Global variable to store the image Blob
+let generatedImageBlob = null;
+
 async function generateImageBlob(desc) {
     const apiUrl = 'http://165.22.175.90:3000/generate-image'; // Your API endpoint
 
+    console.log('Sending request to your API to generate image.');
     try {
-        console.log('Sending request to your API to generate image.');
         const generationResponse = await fetch(apiUrl, {
             method: "POST",
             headers: {
@@ -873,12 +876,14 @@ async function generateImageBlob(desc) {
             throw new Error(`HTTP error fetching image! status: ${imageResponse.status}`);
         }
 
-        return await imageResponse.blob();
+        generatedImageBlob = await imageResponse.blob();
+        return generatedImageBlob;
     } catch (error) {
         console.error('Failed to generate image with error:', error);
         throw error; // Rethrow the error if needed or handle it accordingly
     }
 }
+
 
 
 async function uploadToIPFS(file) {
@@ -928,31 +933,38 @@ async function handlePostSubmission(event) {
     const imagePromptElement = document.getElementById('imagePrompt');
 
     let imageLink = '';
+    let proceedWithPost = false; // Flag to check if we have either image or text to proceed
 
+    // Check if user uploaded an image
     if (imageOption === 'upload' && imageUploadElement.files.length > 0) {
         const file = imageUploadElement.files[0];
         imageLink = await uploadToIPFS(file);
-    } else if (imageOption === 'generate') {
-        const desc = imagePromptElement.value.trim();
-        if (desc) {
-            const imageBlob = await generateImageBlob(desc);
-            imageLink = await uploadToIPFS(imageBlob);
-        }
+        proceedWithPost = true; // We can proceed as we have an image
+    } else if (imageOption === 'generate' && generatedImageBlob) {
+        // Use the previously generated image
+        imageLink = await uploadToIPFS(generatedImageBlob);
+        proceedWithPost = true; // We can proceed as we have an image
     }
 
-    if (imageLink && postText) {
+    // Allow posting if we have at least an image or some text
+    if (proceedWithPost || postText) {
         const metadata = {
-            description: postText,
-            image: imageLink,
-            attributes: [
-                {
-                    trait_type: "Prompt",
-                    value: imagePromptElement.value.trim()
-                }
-            ]
+            description: postText ? postText : "",
+            image: imageLink ? imageLink : "",
+            attributes: []
         };
+
+        // Add prompt to attributes if available
+        if (imagePromptElement && imagePromptElement.value.trim()) {
+            metadata.attributes.push({
+                trait_type: "Prompt",
+                value: imagePromptElement.value.trim()
+            });
+        }
 
         const metadataLink = await uploadToIPFS(new Blob([JSON.stringify(metadata)], {type: "application/json"}));
         await createPost(metadataLink);
+    } else {
+        console.error('Unable to post. Please provide either an image or some text.');
     }
 }
