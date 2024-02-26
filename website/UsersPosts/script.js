@@ -69,6 +69,235 @@ const userManABI = [
 	}
 ];
 
+const reactLiquidityPoolABI = [
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "nftId",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "reactSubId",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "amount",
+				"type": "uint256"
+			}
+		],
+		"name": "deposit",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_reactToken",
+				"type": "address"
+			}
+		],
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "owner",
+				"type": "address"
+			}
+		],
+		"name": "OwnableInvalidOwner",
+		"type": "error"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "account",
+				"type": "address"
+			}
+		],
+		"name": "OwnableUnauthorizedAccount",
+		"type": "error"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "previousOwner",
+				"type": "address"
+			},
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "newOwner",
+				"type": "address"
+			}
+		],
+		"name": "OwnershipTransferred",
+		"type": "event"
+	},
+	{
+		"inputs": [],
+		"name": "renounceOwnership",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "newOwner",
+				"type": "address"
+			}
+		],
+		"name": "transferOwnership",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "nftId",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "reactSubId",
+				"type": "uint256"
+			}
+		],
+		"name": "withdraw",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "nftId",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "reactSubId",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "amount",
+				"type": "uint256"
+			}
+		],
+		"name": "calculateShares",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "nftId",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "reactSubId",
+				"type": "uint256"
+			}
+		],
+		"name": "getPoolInfo",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "totalShares",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "totalDeposited",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "nftId",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "reactSubId",
+				"type": "uint256"
+			},
+			{
+				"internalType": "address",
+				"name": "user",
+				"type": "address"
+			}
+		],
+		"name": "getUserShares",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "owner",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "reactToken",
+		"outputs": [
+			{
+				"internalType": "contract IERC20",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+];
+
 const postNftABI = [
 	{
 		"inputs": [
@@ -694,6 +923,31 @@ const postNftABI = [
 	}
 ];
 
+const erc20ABI = [
+    // Simplified ABI for brevity; include only the functions you need
+    {
+        "constant": true,
+        "inputs": [{"name": "_owner", "type": "address"}, {"name": "_spender", "type": "address"}],
+        "name": "allowance",
+        "outputs": [{"name": "", "type": "uint256"}],
+        "type": "function"
+    },
+    {
+        "constant": false,
+        "inputs": [{"name": "_spender", "type": "address"}, {"name": "_value", "type": "uint256"}],
+        "name": "approve",
+        "outputs": [{"name": "", "type": "bool"}],
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [{"name": "_owner", "type": "address"}],
+        "name": "balanceOf",
+        "outputs": [{"name": "balance", "type": "uint256"}],
+        "type": "function"
+    }
+];
+
 document.addEventListener('DOMContentLoaded', () => {
     init();
 });
@@ -708,6 +962,11 @@ const ethereumButton = document.querySelector('#connectButton');
 const userAvatar = document.querySelector('#userAvatar');
 const userName = document.querySelector('#userName');
 const postFeed = document.getElementById('postFeed'); // Reference to the post feed container
+
+const reactLiquidityPoolAddress = '0x64410bDCc0Eba0dc30fB27Db4C57cEB0E99c63DC';
+const reactTokenAddress = '0xd9941136c56C5Bb64e3ab63e4Def6a4142c0654A';
+
+
 
 async function init() {
     if (typeof window.ethereum !== 'undefined') {
@@ -758,12 +1017,14 @@ async function connectToMetaMask() {
         console.error('MetaMask is not installed!');
     }
 }
+let provider;
 
 function initContracts() {
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    provider = new ethers.providers.Web3Provider(window.ethereum);
     const signer = provider.getSigner();
     userContract = new ethers.Contract(userManAddress, userManABI, signer);
     postNftContract = new ethers.Contract(postNftAddress, postNftABI, signer);
+    reactLiquidityPoolContract = new ethers.Contract(reactLiquidityPoolAddress, reactLiquidityPoolABI, signer);
 }
 
 async function displayUserInfo(address) {
@@ -786,7 +1047,8 @@ async function displayUserPosts(address) {
             if (post[2]) { // Assuming post[2] is the URI based on the tuple structure provided
                 fetchPostMetadata(post[2]).then(metadata => {
                     if (metadata) {
-                        addPostToFeed(metadata, post[3]); // Assuming post[3] is the createdAt timestamp
+                        const postElement = addPostToFeed(metadata, post[3]); // Assuming post[3] is the createdAt timestamp
+                        addReactOptionsToPost(postId, postElement);
                     }
                 });
             }
@@ -795,7 +1057,6 @@ async function displayUserPosts(address) {
         console.error('Error fetching posts:', error);
     }
 }
-
 async function fetchPostMetadata(uri) {
     try {
         const response = await fetch(uri);
@@ -808,7 +1069,7 @@ async function fetchPostMetadata(uri) {
 }
 
 function addPostToFeed(metadata, createdAt) {
-    if (!metadata) return;
+    if (!metadata) return null;
 
     const postElement = document.createElement('article');
     postElement.classList.add('post-container');
@@ -826,6 +1087,8 @@ function addPostToFeed(metadata, createdAt) {
 
     postElement.innerHTML = innerHTMLContent;
     postFeed.appendChild(postElement);
+
+    return postElement; // Return the created element
 }
 
 function getAddressFromURL() {
@@ -842,4 +1105,129 @@ async function handleAccountsChanged(accounts) {
         await displayUserInfo(selectedAccount);
         await displayUserPosts(selectedAccount);
     }
+}
+
+async function withdrawReact(postId) {
+    try {
+        // Fetch user shares for both upvotes and downvotes
+        const upvoteShares = await reactLiquidityPoolContract.getUserShares(postId, 1, selectedAccount);
+        const downvoteShares = await reactLiquidityPoolContract.getUserShares(postId, 0, selectedAccount);
+
+        let reactSubId; // Variable to hold the user's choice of react pool
+
+        // If the user has shares in both pools, prompt them to choose which to withdraw from
+        if (upvoteShares.gt(0) && downvoteShares.gt(0)) {
+            const userChoice = prompt("You have REACT tokens in both pools. Enter '1' to withdraw from Upvotes, '0' for Downvotes:");
+            if (userChoice !== '1' && userChoice !== '0') {
+                alert("Invalid choice. Transaction cancelled.");
+                return;
+            }
+            reactSubId = parseInt(userChoice);
+        } else if (upvoteShares.gt(0)) {
+            reactSubId = 1; // Automatically choose upvotes if only in upvote pool
+        } else if (downvoteShares.gt(0)) {
+            reactSubId = 0; // Automatically choose downvotes if only in downvote pool
+        } else {
+            alert("You do not have REACT tokens to withdraw.");
+            return;
+        }
+
+        // Proceed with withdrawal from the selected pool
+        const tx = await reactLiquidityPoolContract.withdraw(postId, reactSubId);
+        await tx.wait();
+        alert("Withdrawn successfully!");
+        updatePoolInfo(postId);
+    } catch (error) {
+        console.error('Error withdrawing:', error);
+        alert("Failed to withdraw.");
+    }
+}
+
+async function updatePoolInfo(postId) {
+    try {
+        // Fetch pool info for upvotes
+        const upvoteInfo = await reactLiquidityPoolContract.getPoolInfo(postId, 1);
+        const upvoteShares = await reactLiquidityPoolContract.getUserShares(postId, 1, selectedAccount);
+
+        // Fetch pool info for downvotes
+        const downvoteInfo = await reactLiquidityPoolContract.getPoolInfo(postId, 0);
+        const downvoteShares = await reactLiquidityPoolContract.getUserShares(postId, 0, selectedAccount);
+
+        // Update UI
+        document.getElementById(`poolInfo-${postId}`).innerHTML = `
+            <p>Upvotes Total: ${ethers.utils.formatUnits(upvoteInfo.totalDeposited, 18)} REACT. Your Stake: ${ethers.utils.formatUnits(upvoteShares, 18)} REACT.</p>
+            <p>Downvotes Total: ${ethers.utils.formatUnits(downvoteInfo.totalDeposited, 18)} REACT. Your Stake: ${ethers.utils.formatUnits(downvoteShares, 18)} REACT.</p>
+        `;
+
+        // Show withdraw button if the user has shares in either pool
+        if (upvoteShares.gt(0) || downvoteShares.gt(0)) {
+            document.getElementById(`withdrawBtn-${postId}`).style.display = 'block';
+        } else {
+            document.getElementById(`withdrawBtn-${postId}`).style.display = 'none';
+        }
+    } catch (error) {
+        console.error('Error updating pool info:', error);
+    }
+}
+
+async function reactToPost(postId, reactType) {
+    const amount = prompt("Enter the amount of REACT tokens to stake:");
+    if (!amount || isNaN(amount)) {
+        alert("Invalid amount.");
+        return;
+    }
+
+    const reactTokenContract = new ethers.Contract(reactTokenAddress, erc20ABI, provider.getSigner());
+    const userAddress = await provider.getSigner().getAddress();
+    const amountToStake = ethers.utils.parseUnits(amount, 18);
+
+    // Check user's React token balance
+    const balance = await reactTokenContract.balanceOf(userAddress);
+    if (balance.lt(amountToStake)) {
+        alert("Insufficient REACT token balance.");
+        return;
+    }
+
+    // Check allowance
+    const allowance = await reactTokenContract.allowance(userAddress, reactLiquidityPoolAddress);
+    if (allowance.lt(amountToStake)) {
+        // Need to approve first
+        try {
+            const approveTx = await reactTokenContract.approve(reactLiquidityPoolAddress, amountToStake);
+            await approveTx.wait();
+            alert("Approval transaction successful. Now you can stake your tokens.");
+        } catch (error) {
+            console.error('Error approving React tokens:', error);
+            alert("Failed to approve React tokens.");
+            return;
+        }
+    }
+
+    // Proceed with staking after approval
+    try {
+        const tx = await reactLiquidityPoolContract.deposit(postId, reactType, amountToStake);
+        await tx.wait();
+        alert("Reacted successfully!");
+        updatePoolInfo(postId);
+    } catch (error) {
+        console.error('Error reacting to post:', error);
+        alert("Failed to react to post.");
+    }
+}
+
+function addReactOptionsToPost(postId, postElement) {
+    const reactOptionsHTML = `
+        <div class="react-options">
+            <button id="upvote-${postId}">Upvote</button>
+            <button id="downvote-${postId}">Downvote</button>
+            <div id="poolInfo-${postId}"></div>
+            <button id="withdrawBtn-${postId}" style="display:none;">Withdraw</button>
+        </div>
+    `;
+    postElement.innerHTML += reactOptionsHTML;
+    updatePoolInfo(postId);
+
+    document.getElementById(`upvote-${postId}`).addEventListener('click', () => reactToPost(postId, 1));
+    document.getElementById(`downvote-${postId}`).addEventListener('click', () => reactToPost(postId, 0));
+    document.getElementById(`withdrawBtn-${postId}`).addEventListener('click', () => withdrawReact(postId));
 }

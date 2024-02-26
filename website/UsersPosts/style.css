@@ -94,3 +94,51 @@ article {
 article h2, article p {
     margin: 0 0 10px 0;
 }
+.react-options {
+    margin-top: 20px;
+}
+
+.react-options button {
+    margin-right: 10px;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+#postFeed .post-container {
+    margin-bottom: 20px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.post-container {
+    border: 1px solid #ddd;
+    margin-bottom: 20px;
+    padding: 15px;
+    border-radius: 8px;
+}
+
+/* New styles */
+.react-options {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.react-options button {
+    margin: 0 10px;
+    padding: 5px 15px;
+    cursor: pointer;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+}
+
+.react-options p {
+    margin: 5px 0;
+    font-size: 14px;
+}
+
+#poolInfo-${postId} {
+    margin-top: 10px;
+}
