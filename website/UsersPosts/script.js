@@ -953,18 +953,19 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 let selectedAccount;
-let userContract, postNftContract;
+let userContract;
 
-const userManAddress = '0x27F92240a258a1f4e5Ee0471B502e2d1b1D28FEd';
-const postNftAddress = '0x5Aa3Ec4712f179cd14733F13177e840D3c7C9f65';
+const userManAddress = '0xFDaCA2f2dc6B4a55e1F35143AB4cc60D896686a4';
+const postNftAddress = '0x482e4D9AF909DBCdCd1829dEf58020C646edE93D';
+const reactLiquidityPoolAddress = '0x1639412AFbe991b94df1181eC5e5A89b5f5F6Fa6';
+const reactTokenAddress = '0xd9941136c56C5Bb64e3ab63e4Def6a4142c0654A';
 
 const ethereumButton = document.querySelector('#connectButton');
 const userAvatar = document.querySelector('#userAvatar');
 const userName = document.querySelector('#userName');
 const postFeed = document.getElementById('postFeed'); // Reference to the post feed container
 
-const reactLiquidityPoolAddress = '0x64410bDCc0Eba0dc30fB27Db4C57cEB0E99c63DC';
-const reactTokenAddress = '0xd9941136c56C5Bb64e3ab63e4Def6a4142c0654A';
+
 
 
 

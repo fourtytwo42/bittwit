@@ -75,6 +75,43 @@ const contractABI = [
 				"type": "uint256"
 			}
 		],
+		"name": "AvatarAdded",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "user",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "avatarContract",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "avatarTokenId",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "bool",
+				"name": "isERC1155",
+				"type": "bool"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "avatarAmount",
+				"type": "uint256"
+			}
+		],
 		"name": "AvatarUpdated",
 		"type": "event"
 	},
@@ -98,87 +135,6 @@ const contractABI = [
 		"type": "event"
 	},
 	{
-		"inputs": [
-			{
-				"internalType": "string",
-				"name": "username",
-				"type": "string"
-			},
-			{
-				"internalType": "address",
-				"name": "avatarContract",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "avatarTokenId",
-				"type": "uint256"
-			},
-			{
-				"internalType": "bool",
-				"name": "isERC1155",
-				"type": "bool"
-			},
-			{
-				"internalType": "uint256",
-				"name": "avatarAmount",
-				"type": "uint256"
-			}
-		],
-		"name": "registerUser",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "renounceOwnership",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "newOwner",
-				"type": "address"
-			}
-		],
-		"name": "transferOwnership",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "avatarContract",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "avatarTokenId",
-				"type": "uint256"
-			},
-			{
-				"internalType": "bool",
-				"name": "isERC1155",
-				"type": "bool"
-			},
-			{
-				"internalType": "uint256",
-				"name": "avatarAmount",
-				"type": "uint256"
-			}
-		],
-		"name": "updateAvatar",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
 		"anonymous": false,
 		"inputs": [
 			{
@@ -192,34 +148,62 @@ const contractABI = [
 				"internalType": "string",
 				"name": "username",
 				"type": "string"
+			}
+		],
+		"name": "UserRegistered",
+		"type": "event"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "username",
+				"type": "string"
 			},
 			{
-				"indexed": false,
 				"internalType": "address",
 				"name": "avatarContract",
 				"type": "address"
 			},
 			{
-				"indexed": false,
 				"internalType": "uint256",
 				"name": "avatarTokenId",
 				"type": "uint256"
 			},
 			{
-				"indexed": false,
 				"internalType": "bool",
 				"name": "isERC1155",
 				"type": "bool"
 			},
 			{
-				"indexed": false,
 				"internalType": "uint256",
 				"name": "avatarAmount",
 				"type": "uint256"
 			}
 		],
-		"name": "UserRegistered",
-		"type": "event"
+		"name": "addAvatar",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "username",
+				"type": "string"
+			}
+		],
+		"name": "getAddressByUsername",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
 	},
 	{
 		"inputs": [],
@@ -311,9 +295,42 @@ const contractABI = [
 		],
 		"stateMutability": "view",
 		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "username",
+				"type": "string"
+			}
+		],
+		"name": "registerUser",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "renounceOwnership",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "newOwner",
+				"type": "address"
+			}
+		],
+		"name": "transferOwnership",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
 	}
 ];
-const contractAddress = '0x27F92240a258a1f4e5Ee0471B502e2d1b1D28FEd';
+const contractAddress = '0xFDaCA2f2dc6B4a55e1F35143AB4cc60D896686a4';
 
 document.addEventListener('DOMContentLoaded', () => {
     init();
@@ -393,21 +410,18 @@ async function checkUserRegistration() {
 
 registerUserButton.addEventListener('click', async () => {
     const username = usernameInput.value.trim();
-    const avatarContract = avatarContractInput.value.trim();
-    const avatarTokenId = avatarTokenIdInput.value.trim();
-    const isERC1155 = isERC1155Input.checked;
-    const avatarAmount = 1;
 
-    if (!username || !avatarContract || !avatarTokenId) {
-        alert('Username, Avatar Contract, and Avatar Token ID are required');
+    if (!username) {
+        alert('Username is required');
         return;
     }
     try {
-        await userContract.registerUser(username, avatarContract, avatarTokenId, isERC1155, avatarAmount);
+        const tx = await userContract.registerUser(username);
+        await tx.wait();
+        console.log('User registered successfully with username:', username);
         userName.innerText = username;
-        userAvatar.src = 'PATH_OR_METHOD_TO_RESOLVE_NFT_IMAGE';
-        console.log('User registered/updated successfully');
+        // Reset or handle avatar display logic as necessary
     } catch (error) {
-        console.error('Error registering/updating user:', error);
+        console.error('Error registering user:', error);
     }
 });

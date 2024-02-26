@@ -694,15 +694,15 @@ const postNftABI = [
 	}
 ];
 
-const userManAddress = '0x27F92240a258a1f4e5Ee0471B502e2d1b1D28FEd';
-const postNftAddress = '0x5Aa3Ec4712f179cd14733F13177e840D3c7C9f65';
+const userManAddress = '0xFDaCA2f2dc6B4a55e1F35143AB4cc60D896686a4';
+const postNftAddress = '0x482e4D9AF909DBCdCd1829dEf58020C646edE93D';
 
 const ethereumButton = document.querySelector('#connectButton');
 const registerUserButton = document.querySelector('#registerUserButton');
 const userAvatar = document.querySelector('#userAvatar');
 const userName = document.querySelector('#userName');
 let selectedAccount;
-let userContract, postNftContract;
+let userContract;
 
 document.addEventListener('DOMContentLoaded', () => {
     init();
@@ -839,7 +839,7 @@ document.getElementById('imageUpload').addEventListener('change', function(event
     }
 });
 
-async function generateImageBlob(desc, retries = 3, delay = 1000) {
+async function generateImageBlob(desc, retries = 5, delay = 1000) {
     const hfApiKey = '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';
 
     for (let i = 0; i < retries; i++) {
