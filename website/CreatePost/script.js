@@ -839,38 +839,47 @@ document.getElementById('imageUpload').addEventListener('change', function(event
     }
 });
 
-async function generateImageBlob(desc, retries = 5, delay = 1000) {
-    const hfApiKey = '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';
+async function generateImageBlob(desc) {
+    const apiUrl = 'http://165.22.175.90:3000/generate-image'; // Your API endpoint
 
-    for (let i = 0; i < retries; i++) {
-        try {
-            const response = await fetch(
-                "https://api-inference.huggingface.co/models/prompthero/openjourney-v4",
-                {
-                    method: "POST",
-                    headers: {
-                        'Authorization': `Bearer ${hfApiKey}`,
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ inputs: desc }),
-                }
-            );
+    try {
+        console.log('Sending request to your API to generate image.');
+        const generationResponse = await fetch(apiUrl, {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                prompt: desc, // Description or prompt for the image
+            }),
+        });
 
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            return await response.blob();
-        } catch (error) {
-            console.error(`Attempt ${i + 1} failed:`, error);
-
-            if (i === retries - 1) throw error;
-
-            await new Promise(resolve => setTimeout(resolve, delay));
-            delay *= 2;
+        if (!generationResponse.ok) {
+            throw new Error(`HTTP error! status: ${generationResponse.status}`);
         }
+
+        const data = await generationResponse.json();
+        if (!data.imageUrl) {
+            console.log(`Response data is not as expected: `, JSON.stringify(data, null, 2));
+            throw new Error('No image URL found in response or response format is not as expected.');
+        }
+        const imageUrl = data.imageUrl.startsWith('http') ? data.imageUrl : `http://165.22.175.90:3000${data.imageUrl}`;
+        console.log(`Generated image URL: ${imageUrl}`);
+
+        console.log(`Fetching generated image from URL: ${imageUrl}`);
+        const imageResponse = await fetch(imageUrl);
+
+        if (!imageResponse.ok) {
+            throw new Error(`HTTP error fetching image! status: ${imageResponse.status}`);
+        }
+
+        return await imageResponse.blob();
+    } catch (error) {
+        console.error('Failed to generate image with error:', error);
+        throw error; // Rethrow the error if needed or handle it accordingly
     }
 }
+
 
 async function uploadToIPFS(file) {
     const formData = new FormData();
