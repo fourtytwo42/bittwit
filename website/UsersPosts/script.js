@@ -92,17 +92,7 @@ const postNftABI = [
 		"inputs": [
 			{
 				"internalType": "string",
-				"name": "textLink",
-				"type": "string"
-			},
-			{
-				"internalType": "string",
-				"name": "imageLink",
-				"type": "string"
-			},
-			{
-				"internalType": "string",
-				"name": "promptLink",
+				"name": "uri",
 				"type": "string"
 			}
 		],
@@ -334,19 +324,7 @@ const postNftABI = [
 			{
 				"indexed": false,
 				"internalType": "string",
-				"name": "textLink",
-				"type": "string"
-			},
-			{
-				"indexed": false,
-				"internalType": "string",
-				"name": "imageLink",
-				"type": "string"
-			},
-			{
-				"indexed": false,
-				"internalType": "string",
-				"name": "promptLink",
+				"name": "uri",
 				"type": "string"
 			},
 			{
@@ -558,17 +536,7 @@ const postNftABI = [
 					},
 					{
 						"internalType": "string",
-						"name": "textLink",
-						"type": "string"
-					},
-					{
-						"internalType": "string",
-						"name": "imageLink",
-						"type": "string"
-					},
-					{
-						"internalType": "string",
-						"name": "promptLink",
+						"name": "uri",
 						"type": "string"
 					},
 					{
@@ -726,19 +694,20 @@ const postNftABI = [
 	}
 ];
 
+document.addEventListener('DOMContentLoaded', () => {
+    init();
+});
+
+let selectedAccount;
+let userContract, postNftContract;
+
 const userManAddress = '0x27F92240a258a1f4e5Ee0471B502e2d1b1D28FEd';
-const postNftAddress = '0x26424168B9FD90bc3f4a42a4f1F6b15E327A023D';
+const postNftAddress = '0x5Aa3Ec4712f179cd14733F13177e840D3c7C9f65';
 
 const ethereumButton = document.querySelector('#connectButton');
 const userAvatar = document.querySelector('#userAvatar');
 const userName = document.querySelector('#userName');
 const postFeed = document.getElementById('postFeed'); // Reference to the post feed container
-let selectedAccount;
-let userContract, postNftContract;
-
-document.addEventListener('DOMContentLoaded', () => {
-    init();
-});
 
 async function init() {
     if (typeof window.ethereum !== 'undefined') {
@@ -802,7 +771,7 @@ async function displayUserInfo(address) {
         const userInfo = await userContract.getUserInfo(address);
         if (userInfo && userInfo.username) {
             userName.innerText = userInfo.username;
-            userAvatar.src = 'PATH_OR_METHOD_TO_RESOLVE_NFT_IMAGE'; // Update this path as needed
+            userAvatar.src = 'PATH_OR_METHOD_TO_RESOLVE_USER_AVATAR'; // Replace with actual method/path to resolve user avatars
         }
     } catch (error) {
         console.error('Error fetching user info:', error);
@@ -814,25 +783,44 @@ async function displayUserPosts(address) {
         const postIds = await postNftContract.getPostsByAuthor(address);
         for (const postId of postIds) {
             const post = await postNftContract.getPost(postId);
-            addPostToFeed(post);
+            if (post[2]) { // Assuming post[2] is the URI based on the tuple structure provided
+                fetchPostMetadata(post[2]).then(metadata => {
+                    if (metadata) {
+                        addPostToFeed(metadata, post[3]); // Assuming post[3] is the createdAt timestamp
+                    }
+                });
+            }
         }
     } catch (error) {
         console.error('Error fetching posts:', error);
     }
 }
 
-function addPostToFeed(post) {
+async function fetchPostMetadata(uri) {
+    try {
+        const response = await fetch(uri);
+        if (!response.ok) throw new Error('Failed to fetch post metadata');
+        return await response.json();
+    } catch (error) {
+        console.error('Error fetching post metadata:', error);
+        return null;
+    }
+}
+
+function addPostToFeed(metadata, createdAt) {
+    if (!metadata) return;
+
     const postElement = document.createElement('article');
-    postElement.classList.add('post-container'); // Ensures consistency with CSS styling
+    postElement.classList.add('post-container');
 
     let innerHTMLContent = `
         <div class="post-content">
-            <p class="post-timestamp">Posted on: ${new Date(post.createdAt * 1000).toLocaleString()}</p>
-            <p class="post-text"><a>${post.textLink}</a></p>
-            ${post.promptLink !== "" ? `<p class="post-prompt"><a>Prompt: ${post.promptLink}</a></p>` : ''}
+            <p class="post-timestamp">Posted on: ${new Date(createdAt * 1000).toLocaleString()}</p>
+            <p class="post-text">${metadata.description}</p>
+            ${metadata.attributes && metadata.attributes.find(attr => attr.trait_type === "Prompt") ? `<p class="post-prompt">Prompt: ${metadata.attributes.find(attr => attr.trait_type === "Prompt").value}</p>` : ''}
         </div>
         <div class="post-image">
-            <a><img src="${post.imageLink}" ></a>
+            <img src="${metadata.image}" alt="Post image">
         </div>
     `;
 
@@ -840,11 +828,9 @@ function addPostToFeed(post) {
     postFeed.appendChild(postElement);
 }
 
-
-
 function getAddressFromURL() {
     const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get('user'); // Changed to 'user' to match your example
+    return urlParams.get('user');
 }
 
 async function handleAccountsChanged(accounts) {

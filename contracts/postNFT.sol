@@ -13,9 +13,7 @@ contract PostNFT is ERC721, Ownable {
     struct Post {
         uint256 id;
         address author;
-        string textLink;
-        string imageLink;
-        string promptLink;
+        string uri; // URI to JSON containing post details (text, image, prompt links)
         uint256 createdAt; // Timestamp of post creation
     }
 
@@ -24,16 +22,14 @@ contract PostNFT is ERC721, Ownable {
 
     UserManagement private userManagement;
 
-    event PostCreated(uint256 indexed postId, address indexed author, string textLink, string imageLink, string promptLink, uint256 createdAt);
+    event PostCreated(uint256 indexed postId, address indexed author, string uri, uint256 createdAt);
 
     constructor(address userManagementAddress) ERC721("PostNFT", "PNFT") Ownable(msg.sender) {
         userManagement = UserManagement(userManagementAddress);
     }
 
-    function createPost(string memory textLink, string memory imageLink, string memory promptLink) public {
-        require(bytes(textLink).length <= 255, "Text link exceeds maximum length");
-        require(bytes(imageLink).length <= 255, "Image link exceeds maximum length");
-        require(bytes(promptLink).length <= 255, "Prompt link exceeds maximum length");
+    function createPost(string memory uri) public {
+        require(bytes(uri).length <= 255, "URI exceeds maximum length");
         require(bytes(userManagement.getUserInfo(msg.sender).username).length > 0, "User not registered.");
 
         _postIds.increment();
@@ -42,16 +38,14 @@ contract PostNFT is ERC721, Ownable {
         posts[newPostId] = Post({
             id: newPostId,
             author: msg.sender,
-            textLink: textLink,
-            imageLink: imageLink,
-            promptLink: promptLink,
+            uri: uri,
             createdAt: block.timestamp // Assign current block timestamp
         });
 
         postsByAuthor[msg.sender].push(newPostId);
 
         _mint(msg.sender, newPostId);
-        emit PostCreated(newPostId, msg.sender, textLink, imageLink, promptLink, block.timestamp);
+        emit PostCreated(newPostId, msg.sender, uri, block.timestamp);
     }
 
     function getPost(uint256 postId) public view returns (Post memory) {
@@ -61,5 +55,5 @@ contract PostNFT is ERC721, Ownable {
     function getPostsByAuthor(address author) public view returns (uint256[] memory) {
         return postsByAuthor[author];
     }
-}
 
+}

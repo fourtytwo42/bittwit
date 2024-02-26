@@ -74,47 +74,6 @@ const postNftABI = [
 		"inputs": [
 			{
 				"internalType": "address",
-				"name": "to",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "tokenId",
-				"type": "uint256"
-			}
-		],
-		"name": "approve",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "string",
-				"name": "textLink",
-				"type": "string"
-			},
-			{
-				"internalType": "string",
-				"name": "imageLink",
-				"type": "string"
-			},
-			{
-				"internalType": "string",
-				"name": "promptLink",
-				"type": "string"
-			}
-		],
-		"name": "createPost",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
 				"name": "userManagementAddress",
 				"type": "address"
 			}
@@ -334,19 +293,7 @@ const postNftABI = [
 			{
 				"indexed": false,
 				"internalType": "string",
-				"name": "textLink",
-				"type": "string"
-			},
-			{
-				"indexed": false,
-				"internalType": "string",
-				"name": "imageLink",
-				"type": "string"
-			},
-			{
-				"indexed": false,
-				"internalType": "string",
-				"name": "promptLink",
+				"name": "uri",
 				"type": "string"
 			},
 			{
@@ -358,82 +305,6 @@ const postNftABI = [
 		],
 		"name": "PostCreated",
 		"type": "event"
-	},
-	{
-		"inputs": [],
-		"name": "renounceOwnership",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "from",
-				"type": "address"
-			},
-			{
-				"internalType": "address",
-				"name": "to",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "tokenId",
-				"type": "uint256"
-			}
-		],
-		"name": "safeTransferFrom",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "from",
-				"type": "address"
-			},
-			{
-				"internalType": "address",
-				"name": "to",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "tokenId",
-				"type": "uint256"
-			},
-			{
-				"internalType": "bytes",
-				"name": "data",
-				"type": "bytes"
-			}
-		],
-		"name": "safeTransferFrom",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "operator",
-				"type": "address"
-			},
-			{
-				"internalType": "bool",
-				"name": "approved",
-				"type": "bool"
-			}
-		],
-		"name": "setApprovalForAll",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
 	},
 	{
 		"anonymous": false,
@@ -464,11 +335,6 @@ const postNftABI = [
 		"inputs": [
 			{
 				"internalType": "address",
-				"name": "from",
-				"type": "address"
-			},
-			{
-				"internalType": "address",
 				"name": "to",
 				"type": "address"
 			},
@@ -478,20 +344,7 @@ const postNftABI = [
 				"type": "uint256"
 			}
 		],
-		"name": "transferFrom",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "newOwner",
-				"type": "address"
-			}
-		],
-		"name": "transferOwnership",
+		"name": "approve",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
@@ -513,6 +366,19 @@ const postNftABI = [
 			}
 		],
 		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "uri",
+				"type": "string"
+			}
+		],
+		"name": "createPost",
+		"outputs": [],
+		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
@@ -558,17 +424,7 @@ const postNftABI = [
 					},
 					{
 						"internalType": "string",
-						"name": "textLink",
-						"type": "string"
-					},
-					{
-						"internalType": "string",
-						"name": "imageLink",
-						"type": "string"
-					},
-					{
-						"internalType": "string",
-						"name": "promptLink",
+						"name": "uri",
 						"type": "string"
 					},
 					{
@@ -674,6 +530,82 @@ const postNftABI = [
 		"type": "function"
 	},
 	{
+		"inputs": [],
+		"name": "renounceOwnership",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "from",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "to",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "tokenId",
+				"type": "uint256"
+			}
+		],
+		"name": "safeTransferFrom",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "from",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "to",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "tokenId",
+				"type": "uint256"
+			},
+			{
+				"internalType": "bytes",
+				"name": "data",
+				"type": "bytes"
+			}
+		],
+		"name": "safeTransferFrom",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "operator",
+				"type": "address"
+			},
+			{
+				"internalType": "bool",
+				"name": "approved",
+				"type": "bool"
+			}
+		],
+		"name": "setApprovalForAll",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
 		"inputs": [
 			{
 				"internalType": "bytes4",
@@ -723,11 +655,47 @@ const postNftABI = [
 		],
 		"stateMutability": "view",
 		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "from",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "to",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "tokenId",
+				"type": "uint256"
+			}
+		],
+		"name": "transferFrom",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "newOwner",
+				"type": "address"
+			}
+		],
+		"name": "transferOwnership",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
 	}
 ];
 
 const userManAddress = '0x27F92240a258a1f4e5Ee0471B502e2d1b1D28FEd';
-const postNftAddress = '0x26424168B9FD90bc3f4a42a4f1F6b15E327A023D';
+const postNftAddress = '0x5Aa3Ec4712f179cd14733F13177e840D3c7C9f65';
 
 const ethereumButton = document.querySelector('#connectButton');
 const registerUserButton = document.querySelector('#registerUserButton');
@@ -766,6 +734,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+
 
 async function init() {
     if (typeof window.ethereum !== 'undefined') {
@@ -838,40 +807,9 @@ async function checkUserRegistration() {
     }
 }
 
-async function handlePostSubmission(event) {
-    event.preventDefault();
-    const postText = document.getElementById('postText').value;
-    const imageOption = document.querySelector('input[name="imageOption"]:checked').value;
-    const imageUploadElement = document.getElementById('imageUpload');
-    const imagePromptElement = document.getElementById('imagePrompt');
 
-    let imageLink = '';
 
-    if (imageOption === 'upload' && imageUploadElement.files.length > 0) {
-        const file = imageUploadElement.files[0];
-        imageLink = await uploadToIPFS(file);
-    } else if (imageOption === 'generate') {
-        const desc = imagePromptElement.value.trim();
-        if (desc) {
-            const imageBlob = await generateImageBlob(desc);
-            imageLink = await uploadToIPFS(imageBlob);
-        }
-    }
 
-    if (imageLink && postText) {
-        await createPost(postText, imageLink, imagePromptElement.value.trim());
-    }
-}
-
-async function createPost(textLink, imageLink, promptLink) {
-    try {
-        const tx = await postNftContract.createPost(textLink, imageLink, promptLink);
-        await tx.wait();
-        console.log('Post created successfully');
-    } catch (error) {
-        console.error('Error creating post:', error);
-    }
-}
 
 function handleImageOptionChange() {
     const uploadInput = document.getElementById('imageUpload');
@@ -960,5 +898,52 @@ async function uploadToIPFS(file) {
     } catch (error) {
         console.error('Error uploading to IPFS via Pinata:', error);
         throw error;
+    }
+}
+
+async function createPost(uri) {
+    try {
+        const tx = await postNftContract.createPost(uri);
+        await tx.wait();
+        console.log('Post created successfully');
+    } catch (error) {
+        console.error('Error creating post:', error);
+    }
+}
+
+async function handlePostSubmission(event) {
+    event.preventDefault();
+    const postText = document.getElementById('postText').value;
+    const imageOption = document.querySelector('input[name="imageOption"]:checked').value;
+    const imageUploadElement = document.getElementById('imageUpload');
+    const imagePromptElement = document.getElementById('imagePrompt');
+
+    let imageLink = '';
+
+    if (imageOption === 'upload' && imageUploadElement.files.length > 0) {
+        const file = imageUploadElement.files[0];
+        imageLink = await uploadToIPFS(file);
+    } else if (imageOption === 'generate') {
+        const desc = imagePromptElement.value.trim();
+        if (desc) {
+            const imageBlob = await generateImageBlob(desc);
+            imageLink = await uploadToIPFS(imageBlob);
+        }
+    }
+
+    if (imageLink && postText) {
+        const metadata = {
+            description: postText,
+            image: imageLink,
+            attributes: [
+                {
+                    trait_type: "Prompt",
+                    value: imagePromptElement.value.trim()
+                }
+            ]
+        };
+
+        const metadataLink = await uploadToIPFS(new Blob([JSON.stringify(metadata)], {type: "application/json"}));
+        await createPost(metadataLink);
     }
 }
