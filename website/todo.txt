@@ -1,0 +1,15 @@
+the owner of the nft post should get paid, they should get an automatic stake in the pool
+the creator should also get a small cut but smaller than the owner if they aren't the same address
+
+friends list and feed from friends list
+top public posts
+top 10 users
+
+use the address ending in ?user=address to show users page, if that is used add a add follow button
+
+more detailed view page for post
+ability to send it on that page or react
+
+need a page for follow feed that spreads out the most recent posts of the people you follow
+
+it looks like your stake is tied to the address in the address bar 
