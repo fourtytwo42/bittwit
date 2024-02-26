@@ -13,3 +13,6 @@ ability to send it on that page or react
 need a page for follow feed that spreads out the most recent posts of the people you follow
 
 it looks like your stake is tied to the address in the address bar 
+
+Register username should be at the top where the username is. Dont collect nft at registration. Put a button on every post they own to set as avatar. Use placeholder image until then. 
+
