@@ -489,6 +489,38 @@ const postNftABI = [
 		"anonymous": false,
 		"inputs": [
 			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "_fromTokenId",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "_toTokenId",
+				"type": "uint256"
+			}
+		],
+		"name": "BatchMetadataUpdate",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "_tokenId",
+				"type": "uint256"
+			}
+		],
+		"name": "MetadataUpdate",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
 				"indexed": true,
 				"internalType": "address",
 				"name": "previousOwner",
@@ -518,12 +550,6 @@ const postNftABI = [
 				"internalType": "address",
 				"name": "author",
 				"type": "address"
-			},
-			{
-				"indexed": false,
-				"internalType": "string",
-				"name": "uri",
-				"type": "string"
 			},
 			{
 				"indexed": false,
@@ -640,31 +666,24 @@ const postNftABI = [
 		"name": "getPost",
 		"outputs": [
 			{
-				"components": [
-					{
-						"internalType": "uint256",
-						"name": "id",
-						"type": "uint256"
-					},
-					{
-						"internalType": "address",
-						"name": "author",
-						"type": "address"
-					},
-					{
-						"internalType": "string",
-						"name": "uri",
-						"type": "string"
-					},
-					{
-						"internalType": "uint256",
-						"name": "createdAt",
-						"type": "uint256"
-					}
-				],
-				"internalType": "struct PostNFT.Post",
+				"internalType": "uint256",
 				"name": "",
-				"type": "tuple"
+				"type": "uint256"
+			},
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			},
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
 			}
 		],
 		"stateMutability": "view",
@@ -924,7 +943,7 @@ const postNftABI = [
 ];
 
 const userManAddress = '0x4bAc50c59611c609c2E3818bd34B22A4F205B80e';
-const postNftAddress = '0x12D4cfac4078c31Bf01fC0EB459F10a72CBa1019';
+const postNftAddress = '0x6b6467F88Ef73Df85045498605D6E558AA15DAE2';
 
 const ethereumButton = document.querySelector('#connectButton');
 const registerUserButton = document.querySelector('#registerUserButton');

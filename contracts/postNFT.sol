@@ -1,20 +1,20 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
-import "./accounts.sol"; // Ensure this path matches your project structure
+import "./accounts.sol"; // Adjust the path as necessary
 
-contract PostNFT is ERC721, Ownable {
+contract PostNFT is ERC721URIStorage, Ownable(msg.sender) {
     using Counters for Counters.Counter;
     Counters.Counter private _postIds;
 
     struct Post {
         uint256 id;
         address author;
-        string uri; // URI to JSON containing post details (text, image, prompt links)
-        uint256 createdAt; // Timestamp of post creation
+        // The `uri` field is removed since it's handled by ERC721URIStorage
+        uint256 createdAt;
     }
 
     mapping(uint256 => Post) private posts;
@@ -22,38 +22,46 @@ contract PostNFT is ERC721, Ownable {
 
     UserManagement private userManagement;
 
-    event PostCreated(uint256 indexed postId, address indexed author, string uri, uint256 createdAt);
+    event PostCreated(uint256 indexed postId, address indexed author, uint256 createdAt);
 
-    constructor(address userManagementAddress) ERC721("PostNFT", "PNFT") Ownable(msg.sender) {
+    constructor(address userManagementAddress) ERC721("PostNFT", "PNFT") {
         userManagement = UserManagement(userManagementAddress);
     }
 
     function createPost(string memory uri) public {
         require(bytes(uri).length <= 255, "URI exceeds maximum length");
-        require(bytes(userManagement.getUserInfo(msg.sender).username).length > 0, "User not registered.");
+
+        UserManagement.UserInfo memory userInfo = userManagement.getUserInfo(msg.sender);
+        require(bytes(userInfo.username).length > 0, "User not registered.");
+        require(!userInfo.isBanned, "User is banned.");
 
         _postIds.increment();
-
         uint256 newPostId = _postIds.current();
+
+        // Set the URI for the token using ERC721URIStorage's function
+        _setTokenURI(newPostId, uri);
+
         posts[newPostId] = Post({
             id: newPostId,
             author: msg.sender,
-            uri: uri,
-            createdAt: block.timestamp // Assign current block timestamp
+            createdAt: block.timestamp
         });
 
         postsByAuthor[msg.sender].push(newPostId);
 
         _mint(msg.sender, newPostId);
-        emit PostCreated(newPostId, msg.sender, uri, block.timestamp);
+        emit PostCreated(newPostId, msg.sender, block.timestamp);
     }
 
-    function getPost(uint256 postId) public view returns (Post memory) {
-        return posts[postId];
+    function getPost(uint256 postId) public view returns (uint256, address, string memory, uint256) {
+    // Call ownerOf to ensure the token exists. This will revert if the token does not exist with "ERC721: owner query for nonexistent token"
+    ownerOf(postId);
+
+    Post memory post = posts[postId];
+    return (post.id, post.author, tokenURI(postId), post.createdAt);
     }
 
     function getPostsByAuthor(address author) public view returns (uint256[] memory) {
         return postsByAuthor[author];
     }
-
 }

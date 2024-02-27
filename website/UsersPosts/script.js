@@ -99,6 +99,11 @@ const reactLiquidityPoolABI = [
 				"internalType": "address",
 				"name": "_reactToken",
 				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "_nftContract",
+				"type": "address"
 			}
 		],
 		"stateMutability": "nonpayable",
@@ -213,6 +218,19 @@ const reactLiquidityPoolABI = [
 		"type": "function"
 	},
 	{
+		"inputs": [],
+		"name": "contractOwnerFeePercent",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
 		"inputs": [
 			{
 				"internalType": "uint256",
@@ -272,12 +290,38 @@ const reactLiquidityPoolABI = [
 	},
 	{
 		"inputs": [],
+		"name": "nftContract",
+		"outputs": [
+			{
+				"internalType": "contract IERC721",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
 		"name": "owner",
 		"outputs": [
 			{
 				"internalType": "address",
 				"name": "",
 				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "postNFTOwnerFeePercent",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
 			}
 		],
 		"stateMutability": "view",
@@ -299,37 +343,6 @@ const reactLiquidityPoolABI = [
 ];
 
 const postNftABI = [
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "to",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "tokenId",
-				"type": "uint256"
-			}
-		],
-		"name": "approve",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "string",
-				"name": "uri",
-				"type": "string"
-			}
-		],
-		"name": "createPost",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
 	{
 		"inputs": [
 			{
@@ -520,6 +533,38 @@ const postNftABI = [
 		"anonymous": false,
 		"inputs": [
 			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "_fromTokenId",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "_toTokenId",
+				"type": "uint256"
+			}
+		],
+		"name": "BatchMetadataUpdate",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "_tokenId",
+				"type": "uint256"
+			}
+		],
+		"name": "MetadataUpdate",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
 				"indexed": true,
 				"internalType": "address",
 				"name": "previousOwner",
@@ -552,12 +597,6 @@ const postNftABI = [
 			},
 			{
 				"indexed": false,
-				"internalType": "string",
-				"name": "uri",
-				"type": "string"
-			},
-			{
-				"indexed": false,
 				"internalType": "uint256",
 				"name": "createdAt",
 				"type": "uint256"
@@ -565,82 +604,6 @@ const postNftABI = [
 		],
 		"name": "PostCreated",
 		"type": "event"
-	},
-	{
-		"inputs": [],
-		"name": "renounceOwnership",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "from",
-				"type": "address"
-			},
-			{
-				"internalType": "address",
-				"name": "to",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "tokenId",
-				"type": "uint256"
-			}
-		],
-		"name": "safeTransferFrom",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "from",
-				"type": "address"
-			},
-			{
-				"internalType": "address",
-				"name": "to",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "tokenId",
-				"type": "uint256"
-			},
-			{
-				"internalType": "bytes",
-				"name": "data",
-				"type": "bytes"
-			}
-		],
-		"name": "safeTransferFrom",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "operator",
-				"type": "address"
-			},
-			{
-				"internalType": "bool",
-				"name": "approved",
-				"type": "bool"
-			}
-		],
-		"name": "setApprovalForAll",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
 	},
 	{
 		"anonymous": false,
@@ -671,11 +634,6 @@ const postNftABI = [
 		"inputs": [
 			{
 				"internalType": "address",
-				"name": "from",
-				"type": "address"
-			},
-			{
-				"internalType": "address",
 				"name": "to",
 				"type": "address"
 			},
@@ -685,20 +643,7 @@ const postNftABI = [
 				"type": "uint256"
 			}
 		],
-		"name": "transferFrom",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "newOwner",
-				"type": "address"
-			}
-		],
-		"name": "transferOwnership",
+		"name": "approve",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
@@ -720,6 +665,19 @@ const postNftABI = [
 			}
 		],
 		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "uri",
+				"type": "string"
+			}
+		],
+		"name": "createPost",
+		"outputs": [],
+		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
@@ -752,31 +710,24 @@ const postNftABI = [
 		"name": "getPost",
 		"outputs": [
 			{
-				"components": [
-					{
-						"internalType": "uint256",
-						"name": "id",
-						"type": "uint256"
-					},
-					{
-						"internalType": "address",
-						"name": "author",
-						"type": "address"
-					},
-					{
-						"internalType": "string",
-						"name": "uri",
-						"type": "string"
-					},
-					{
-						"internalType": "uint256",
-						"name": "createdAt",
-						"type": "uint256"
-					}
-				],
-				"internalType": "struct PostNFT.Post",
+				"internalType": "uint256",
 				"name": "",
-				"type": "tuple"
+				"type": "uint256"
+			},
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			},
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
 			}
 		],
 		"stateMutability": "view",
@@ -871,6 +822,82 @@ const postNftABI = [
 		"type": "function"
 	},
 	{
+		"inputs": [],
+		"name": "renounceOwnership",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "from",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "to",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "tokenId",
+				"type": "uint256"
+			}
+		],
+		"name": "safeTransferFrom",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "from",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "to",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "tokenId",
+				"type": "uint256"
+			},
+			{
+				"internalType": "bytes",
+				"name": "data",
+				"type": "bytes"
+			}
+		],
+		"name": "safeTransferFrom",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "operator",
+				"type": "address"
+			},
+			{
+				"internalType": "bool",
+				"name": "approved",
+				"type": "bool"
+			}
+		],
+		"name": "setApprovalForAll",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
 		"inputs": [
 			{
 				"internalType": "bytes4",
@@ -920,6 +947,42 @@ const postNftABI = [
 		],
 		"stateMutability": "view",
 		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "from",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "to",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "tokenId",
+				"type": "uint256"
+			}
+		],
+		"name": "transferFrom",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "newOwner",
+				"type": "address"
+			}
+		],
+		"name": "transferOwnership",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
 	}
 ];
 
@@ -948,16 +1011,12 @@ const erc20ABI = [
     }
 ];
 
-document.addEventListener('DOMContentLoaded', () => {
-    init();
-});
 
-let selectedAccount;
-let userContract;
+
 
 const userManAddress = '0x4bAc50c59611c609c2E3818bd34B22A4F205B80e';
-const postNftAddress = '0x12D4cfac4078c31Bf01fC0EB459F10a72CBa1019';
-const reactLiquidityPoolAddress = '0x737De288fB44643eA8dcDEA495801da239B09c65';
+const postNftAddress = '0x6b6467F88Ef73Df85045498605D6E558AA15DAE2';
+const reactLiquidityPoolAddress = '0xe920A5A84b93653E268a979b1814B3903D8f60Bf';
 const reactTokenAddress = '0xd9941136c56C5Bb64e3ab63e4Def6a4142c0654A';
 
 const ethereumButton = document.querySelector('#connectButton');
@@ -965,40 +1024,47 @@ const userAvatar = document.querySelector('#userAvatar');
 const userName = document.querySelector('#userName');
 const postFeed = document.getElementById('postFeed'); // Reference to the post feed container
 
+document.addEventListener('DOMContentLoaded', () => {
+    init();
+});
 
 
-
+let provider, userContract, postNftContract, reactLiquidityPoolContract;
 
 async function init() {
     if (typeof window.ethereum !== 'undefined') {
-        await connectToMetaMaskIfNeeded();
-        await initContracts();
-        const addressFromURL = getAddressFromURL();
-        selectedAccount = addressFromURL || selectedAccount;
-        if (selectedAccount) {
-            await displayUserInfo(selectedAccount);
-            await displayUserPosts(selectedAccount);
+        const account = await connectToMetaMaskIfNeeded();
+        if (account) {
+            initContracts();
+            await displayUserInfo(account);
+            await displayUserPosts(account);
+            ethereum.on('accountsChanged', handleAccountsChanged);
         }
-        ethereum.on('accountsChanged', handleAccountsChanged);
+        ethereumButton.addEventListener('click', () => connectToMetaMask().then(account => {
+            if (account) {
+                displayUserInfo(account);
+                displayUserPosts(account);
+            }
+        }));
     } else {
         console.error('MetaMask is not installed!');
     }
-
-    ethereumButton.addEventListener('click', connectToMetaMask);
 }
 
 async function connectToMetaMaskIfNeeded() {
     try {
         const accounts = await ethereum.request({ method: 'eth_accounts' });
         if (accounts.length > 0) {
-            selectedAccount = accounts[0];
-            console.log(`Found connected account: ${selectedAccount}`);
+            console.log(`Found connected account: ${accounts[0]}`);
             ethereumButton.innerText = 'Connected';
+            return accounts[0];
         } else {
             console.log('MetaMask is installed but not connected');
+            return null;
         }
     } catch (error) {
         console.error('Error checking MetaMask connection:', error);
+        return null;
     }
 }
 
@@ -1006,19 +1072,18 @@ async function connectToMetaMask() {
     if (typeof window.ethereum !== 'undefined') {
         try {
             const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-            selectedAccount = accounts[0];
-            console.log(`Connected to account: ${selectedAccount}`);
+            console.log(`Connected to account: ${accounts[0]}`);
             ethereumButton.innerText = 'Connected';
-            await displayUserInfo(selectedAccount);
-            await displayUserPosts(selectedAccount);
+            return accounts[0];
         } catch (error) {
             console.error('Error during account request:', error);
+            return null;
         }
     } else {
         console.error('MetaMask is not installed!');
+        return null;
     }
 }
-let provider;
 
 function initContracts() {
     provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -1033,23 +1098,34 @@ async function displayUserInfo(address) {
         const userInfo = await userContract.getUserInfo(address);
         if (userInfo && userInfo.username) {
             userName.innerText = userInfo.username;
-            userAvatar.src = 'PATH_OR_METHOD_TO_RESOLVE_USER_AVATAR'; // Replace with actual method/path to resolve user avatars
+
+            // Check if the user has selected a Post NFT ID for their avatar
+            if (userInfo.selectedPostNftId) {
+                const postNftUri = await postNftContract.tokenURI(userInfo.selectedPostNftId);
+                if (postNftUri) {
+                    const postNftMetadata = await fetchPostMetadata(postNftUri);
+                    if (postNftMetadata && postNftMetadata.image) {
+                        userAvatar.src = postNftMetadata.image; // Set the avatar image to the Post NFT image
+                    }
+                }
+            }
         }
     } catch (error) {
         console.error('Error fetching user info:', error);
     }
 }
 
+
 async function displayUserPosts(address) {
     try {
         const postIds = await postNftContract.getPostsByAuthor(address);
         for (const postId of postIds) {
             const post = await postNftContract.getPost(postId);
-            if (post[2]) { // Assuming post[2] is the URI based on the tuple structure provided
+            if (post[2]) { // Assuming post[2] is the URI
                 fetchPostMetadata(post[2]).then(metadata => {
                     if (metadata) {
                         const postElement = addPostToFeed(metadata, post[3]); // Assuming post[3] is the createdAt timestamp
-                        addReactOptionsToPost(postId, postElement);
+                        addReactOptionsToPost(postId, postElement, address);
                     }
                 });
             }
@@ -1092,27 +1168,23 @@ function addPostToFeed(metadata, createdAt) {
     return postElement; // Return the created element
 }
 
-function getAddressFromURL() {
-    const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get('user');
-}
 
 async function handleAccountsChanged(accounts) {
     if (accounts.length === 0) {
         console.log('Please connect to MetaMask.');
-    } else if (accounts[0] !== selectedAccount) {
-        selectedAccount = accounts[0];
-        console.log(`Account changed to: ${selectedAccount}`);
-        await displayUserInfo(selectedAccount);
-        await displayUserPosts(selectedAccount);
+    } else {
+        const account = accounts[0];
+        console.log(`Account changed to: ${account}`);
+        await displayUserInfo(account);
+        await displayUserPosts(account);
     }
 }
 
-async function withdrawReact(postId) {
+async function withdrawReact(postId, account) {
     try {
         // Fetch user shares for both upvotes and downvotes
-        const upvoteShares = await reactLiquidityPoolContract.getUserShares(postId, 1, selectedAccount);
-        const downvoteShares = await reactLiquidityPoolContract.getUserShares(postId, 0, selectedAccount);
+        const upvoteShares = await reactLiquidityPoolContract.getUserShares(postId, 1, account);
+        const downvoteShares = await reactLiquidityPoolContract.getUserShares(postId, 0, account);
 
         let reactSubId; // Variable to hold the user's choice of react pool
 
@@ -1144,15 +1216,15 @@ async function withdrawReact(postId) {
     }
 }
 
-async function updatePoolInfo(postId) {
+async function updatePoolInfo(postId, account) {
     try {
         // Fetch pool info for upvotes
         const upvoteInfo = await reactLiquidityPoolContract.getPoolInfo(postId, 1);
-        const upvoteShares = await reactLiquidityPoolContract.getUserShares(postId, 1, selectedAccount);
+        const upvoteShares = await reactLiquidityPoolContract.getUserShares(postId, 1, account);
 
         // Fetch pool info for downvotes
         const downvoteInfo = await reactLiquidityPoolContract.getPoolInfo(postId, 0);
-        const downvoteShares = await reactLiquidityPoolContract.getUserShares(postId, 0, selectedAccount);
+        const downvoteShares = await reactLiquidityPoolContract.getUserShares(postId, 0, account);
 
         // Update UI
         document.getElementById(`poolInfo-${postId}`).innerHTML = `
@@ -1209,14 +1281,14 @@ async function reactToPost(postId, reactType) {
         const tx = await reactLiquidityPoolContract.deposit(postId, reactType, amountToStake);
         await tx.wait();
         alert("Reacted successfully!");
-        updatePoolInfo(postId);
+        updatePoolInfo(postId, userAddress);
     } catch (error) {
         console.error('Error reacting to post:', error);
         alert("Failed to react to post.");
     }
 }
 
-function addReactOptionsToPost(postId, postElement) {
+function addReactOptionsToPost(postId, postElement, account) {
     const reactOptionsHTML = `
         <div class="react-options">
             <button id="upvote-${postId}">Upvote</button>
@@ -1226,9 +1298,9 @@ function addReactOptionsToPost(postId, postElement) {
         </div>
     `;
     postElement.innerHTML += reactOptionsHTML;
-    updatePoolInfo(postId);
+    updatePoolInfo(postId, account);
 
     document.getElementById(`upvote-${postId}`).addEventListener('click', () => reactToPost(postId, 1));
     document.getElementById(`downvote-${postId}`).addEventListener('click', () => reactToPost(postId, 0));
-    document.getElementById(`withdrawBtn-${postId}`).addEventListener('click', () => withdrawReact(postId));
+    document.getElementById(`withdrawBtn-${postId}`).addEventListener('click', () => withdrawReact(postId, account));
 }
