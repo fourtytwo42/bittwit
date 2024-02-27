@@ -955,9 +955,9 @@ document.addEventListener('DOMContentLoaded', () => {
 let selectedAccount;
 let userContract;
 
-const userManAddress = '0xFDaCA2f2dc6B4a55e1F35143AB4cc60D896686a4';
-const postNftAddress = '0x482e4D9AF909DBCdCd1829dEf58020C646edE93D';
-const reactLiquidityPoolAddress = '0x1639412AFbe991b94df1181eC5e5A89b5f5F6Fa6';
+const userManAddress = '0x4bAc50c59611c609c2E3818bd34B22A4F205B80e';
+const postNftAddress = '0x12D4cfac4078c31Bf01fC0EB459F10a72CBa1019';
+const reactLiquidityPoolAddress = '0x737De288fB44643eA8dcDEA495801da239B09c65';
 const reactTokenAddress = '0xd9941136c56C5Bb64e3ab63e4Def6a4142c0654A';
 
 const ethereumButton = document.querySelector('#connectButton');

@@ -45,37 +45,13 @@ const contractABI = [
 		"anonymous": false,
 		"inputs": [
 			{
-				"indexed": true,
-				"internalType": "address",
-				"name": "user",
-				"type": "address"
-			},
-			{
 				"indexed": false,
 				"internalType": "address",
 				"name": "avatarContract",
 				"type": "address"
-			},
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "avatarTokenId",
-				"type": "uint256"
-			},
-			{
-				"indexed": false,
-				"internalType": "bool",
-				"name": "isERC1155",
-				"type": "bool"
-			},
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "avatarAmount",
-				"type": "uint256"
 			}
 		],
-		"name": "AvatarAdded",
+		"name": "AvatarContractUpdated",
 		"type": "event"
 	},
 	{
@@ -89,26 +65,8 @@ const contractABI = [
 			},
 			{
 				"indexed": false,
-				"internalType": "address",
-				"name": "avatarContract",
-				"type": "address"
-			},
-			{
-				"indexed": false,
 				"internalType": "uint256",
 				"name": "avatarTokenId",
-				"type": "uint256"
-			},
-			{
-				"indexed": false,
-				"internalType": "bool",
-				"name": "isERC1155",
-				"type": "bool"
-			},
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "avatarAmount",
 				"type": "uint256"
 			}
 		],
@@ -142,6 +100,19 @@ const contractABI = [
 				"internalType": "address",
 				"name": "user",
 				"type": "address"
+			}
+		],
+		"name": "UserBanned",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "user",
+				"type": "address"
 			},
 			{
 				"indexed": false,
@@ -154,34 +125,46 @@ const contractABI = [
 		"type": "event"
 	},
 	{
+		"anonymous": false,
 		"inputs": [
 			{
-				"internalType": "string",
-				"name": "username",
-				"type": "string"
-			},
-			{
+				"indexed": true,
 				"internalType": "address",
-				"name": "avatarContract",
+				"name": "user",
 				"type": "address"
 			},
 			{
-				"internalType": "uint256",
-				"name": "avatarTokenId",
-				"type": "uint256"
-			},
-			{
-				"internalType": "bool",
-				"name": "isERC1155",
-				"type": "bool"
-			},
-			{
-				"internalType": "uint256",
-				"name": "avatarAmount",
-				"type": "uint256"
+				"indexed": false,
+				"internalType": "string",
+				"name": "newUsername",
+				"type": "string"
 			}
 		],
-		"name": "addAvatar",
+		"name": "UsernameChanged",
+		"type": "event"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "user",
+				"type": "address"
+			}
+		],
+		"name": "banUser",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "newUsername",
+				"type": "string"
+			}
+		],
+		"name": "changeMyUsername",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
@@ -221,25 +204,6 @@ const contractABI = [
 	{
 		"inputs": [
 			{
-				"internalType": "uint256",
-				"name": "index",
-				"type": "uint256"
-			}
-		],
-		"name": "getUserByIndex",
-		"outputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
 				"internalType": "address",
 				"name": "user",
 				"type": "address"
@@ -255,24 +219,14 @@ const contractABI = [
 						"type": "string"
 					},
 					{
-						"internalType": "address",
-						"name": "avatarContract",
-						"type": "address"
-					},
-					{
 						"internalType": "uint256",
 						"name": "avatarTokenId",
 						"type": "uint256"
 					},
 					{
 						"internalType": "bool",
-						"name": "isERC1155",
+						"name": "isBanned",
 						"type": "bool"
-					},
-					{
-						"internalType": "uint256",
-						"name": "avatarAmount",
-						"type": "uint256"
 					}
 				],
 				"internalType": "struct UserManagement.UserInfo",
@@ -320,6 +274,19 @@ const contractABI = [
 		"inputs": [
 			{
 				"internalType": "address",
+				"name": "avatarContractAddress",
+				"type": "address"
+			}
+		],
+		"name": "setAvatarContract",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
 				"name": "newOwner",
 				"type": "address"
 			}
@@ -328,9 +295,22 @@ const contractABI = [
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "avatarTokenId",
+				"type": "uint256"
+			}
+		],
+		"name": "updateAvatar",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
 	}
 ];
-const contractAddress = '0xFDaCA2f2dc6B4a55e1F35143AB4cc60D896686a4';
+const contractAddress = '0x4bAc50c59611c609c2E3818bd34B22A4F205B80e';
 
 document.addEventListener('DOMContentLoaded', () => {
     init();
@@ -399,14 +379,24 @@ async function checkUserRegistration() {
     try {
         const userInfo = await userContract.getUserInfo(selectedAccount);
         console.log(selectedAccount);
-        if (userInfo && userInfo.username) {
+        if (userInfo && userInfo.username && !userInfo.isBanned) {
             userName.innerText = userInfo.username;
-            userAvatar.src = 'PATH_OR_METHOD_TO_RESOLVE_NFT_IMAGE';
+            if (userInfo.avatarTokenId > 0) {
+                // Assuming you have a function to resolve NFT image URL from token ID
+                userAvatar.src = await resolveNFTImage(userInfo.avatarTokenId);
+            } else {
+                // Set to default avatar if no NFT avatar is set
+                userAvatar.src = 'DEFAULT_AVATAR_PATH';
+            }
+        } else {
+            // Handle non-registered or banned user scenario
+            console.log('User not registered or is banned');
         }
     } catch (error) {
         console.error('Error fetching user info:', error);
     }
 }
+
 
 registerUserButton.addEventListener('click', async () => {
     const username = usernameInput.value.trim();
@@ -415,13 +405,31 @@ registerUserButton.addEventListener('click', async () => {
         alert('Username is required');
         return;
     }
+
     try {
-        const tx = await userContract.registerUser(username);
-        await tx.wait();
-        console.log('User registered successfully with username:', username);
-        userName.innerText = username;
-        // Reset or handle avatar display logic as necessary
+        const userInfo = await userContract.getUserInfo(selectedAccount);
+        // If the user is already registered, trigger the change username function
+        if (userInfo && userInfo.username && !userInfo.isBanned) {
+            // Check if the new username is different from the current one
+            if (userInfo.username !== username) {
+                const tx = await userContract.changeMyUsername(username);
+                await tx.wait();
+                console.log('Username changed successfully to:', username);
+                userName.innerText = username;
+                // Avatar handling remains the same as before
+            } else {
+                alert('New username is the same as the current username.');
+            }
+        } else {
+            // If the user is not registered or is banned, attempt to register as new
+            const tx = await userContract.registerUser(username);
+            await tx.wait();
+            console.log('User registered successfully with username:', username);
+            userName.innerText = username;
+            // Since avatar setting is separate, handle the initial avatar display
+            userAvatar.src = 'DEFAULT_AVATAR_PATH'; // Set a default or placeholder avatar
+        }
     } catch (error) {
-        console.error('Error registering user:', error);
+        console.error('Error handling user registration or username change:', error);
     }
 });
