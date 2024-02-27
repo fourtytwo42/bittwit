@@ -1275,18 +1275,18 @@ function createPostElement(metadata, createdAt, postId, username, userAvatar) {
 
     let innerHTMLContent = `
         <div class="post__user-info">
-            <img src="${userAvatar}" alt="User Avatar" class="post__avatar">
+            
             <div>
                 <h3>${username}</h3> <!-- Display username instead of address -->
                 <p class="post__headerSpecial">Posted on: ${new Date(createdAt * 1000).toLocaleString()}</p>
-            </div>
-        </div>
-        <div class="post__left">
-            <div class="post__content">
+				<div class="post__content">
                 <p>${metadata.description}</p>
                 ${promptText}
                 <img src="${metadata.image}" alt="Post image" class="post__image">
             </div>
+            </div>
+
+            
         </div>
         <div class="post__right"></div>
     `;

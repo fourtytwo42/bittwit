@@ -29,7 +29,6 @@ header {
 
 #userProfile {
   display: flex;
-  align-items: center;
   gap: 10px;
 }
 
@@ -106,11 +105,13 @@ button:hover {
 }
 
 .feed {
-  flex: 0.5;
+  flex: 0.5; /* Adjust this value as needed */
   border-right: 1px solid var(--twitter-background);
   min-width: fit-content;
+  max-width: 45%; /* Adjusted from 60% to make the feed narrower */
   overflow-y: scroll;
 }
+
 
 .feed__header {
   position: sticky;
@@ -132,23 +133,13 @@ button:hover {
   scrollbar-width: none;
 }
 
-.post {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  border-bottom: 1px solid var(--twitter-background);
-  padding-bottom: 10px;
-}
 
-.post__content {
-  display: flex;
-}
 
 /* React options styling */
 .react-options {
   display: flex;
   flex-direction: column;
-  align-items: center;
+
   justify-content: center;
   padding: 10px;
 }
@@ -215,85 +206,25 @@ button:hover {
   margin-left: auto;
 }
 
-
-
-
-
-/* post */
-.post__avatar img {
-  border-radius: 50%;
-  height: 40px;
-}
-
 .post {
   display: flex;
+  flex-direction: row;
   align-items: flex-start;
   border-bottom: 1px solid var(--twitter-background);
   padding-bottom: 10px;
+  margin-top: 20px;
 }
 
-.post__body img {
-  width: 450px;
-  object-fit: contain;
-  border-radius: 20px;
-}
-
-.post__footer {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 10px;
-}
-
-.post__badge {
-  font-size: 14px !important;
-  color: var(--twitter-color);
-  margin-right: 5px;
-}
-
-.post__headerSpecial {
-  font-weight: 600;
-  font-size: 12px;
-  color: gray;
-}
-
-.post__headerText h3 {
-  font-size: 15px;
-  margin-bottom: 5px;
-}
-
-.post__headerDescription {
-  margin-bottom: 10px;
-  font-size: 15px;
-}
-
-.post__body {
-  flex: 1;
-  padding: 10px;
-}
-
-.post__avatar {
-  padding: 20px;
-}
-
-
-
-
-
-
-/* Post Styles */
-.post {
+.post__left, .post__right {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  border-bottom: 1px solid var(--twitter-background);
-  width: 80%;
-  margin-top: 20px;
+  width: 50%; /* Adjusted to make left and right sides equal */
 }
 
 .post__user-info {
   display: flex;
   align-items: center;
-  width: 100%;
+  margin-bottom: 10px;
 }
 
 .post__avatar {
@@ -304,44 +235,31 @@ button:hover {
   margin-right: 10px;
 }
 
-.post__left, .post__right {
-  display: flex;
-  flex-direction: column;
-}
-
-.post__left {
-  width: 70%;
-}
-
-.post__right {
-  width: 30%;
-  padding-left: 20px;
-}
-
 .post__content {
   display: flex;
   flex-direction: column;
+  margin-bottom: 10px;
 }
 
 .post__image {
-  max-width: 100%;
+  width: 256px;
   height: auto;
   margin-top: 10px;
+  border-radius: 8px;
 }
 
-/* React Options Styles */
 .react-options {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  align-items: flex-start; /* Align items to the start for a larger area */
+  width: 100%; /* Ensure react options utilize the full area */
 }
 
 .react-options button {
   background-color: var(--twitter-color);
   color: white;
-  padding: 5px 10px;
-  margin: 5px;
+  padding: 10px 20px; /* Increased padding for larger buttons */
+  margin: 10px; /* Increased margin for spacing */
   border: none;
   border-radius: 15px;
   cursor: pointer;
@@ -352,4 +270,5 @@ button:hover {
 }
 
 .pool-info {
-  margin-top: 10px;
+  margin-top: 20px; /* Increased margin-top for more spacing */
+}
