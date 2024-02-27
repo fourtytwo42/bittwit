@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Twitter Clone - Final</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+      integrity="sha512-iBBXm8fW90+nuLcSKlbmrPcLa0OT92xO1BIsZ+ywDWZCvqsWgccV3gFoRBv0z+8dLJgyAHIhR35VZc2oM/gI1w=="
+      crossorigin="anonymous"
+    />
+    <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js" type="application/javascript"></script>
+    <script src="script.js" defer></script>
+</head>
+<body>
+    <!-- Top Bar for User Info and Connect Wallet Button Start -->
+    <header>
+        <div id="userProfile">
+            <img id="userAvatar" src="" alt="User Avatar">
+            <span id="userName">Username</span>
+        </div>
+        <button id="connectButton">Connect to MetaMask</button>
+    </header>
+    <!-- Top Bar for User Info and Connect Wallet Button End -->
+
+    <!-- sidebar starts -->
+    <div class="sidebar" id="sidebar">
+      <i class="fab fa-twitter" id="twitterIcon"></i>
+      <div class="sidebarOption" id="homeOption">
+        <span class="material-icons"> home </span>
+        <h2>Home</h2>
+      </div>
+      <!-- Other sidebar options omitted for brevity -->
+      <button class="sidebar__tweet" id="tweetButton">Tweet</button>
+    </div>
+    <!-- sidebar ends -->
+
+    <!-- feed starts -->
+    <div class="feed" id="feed">
+      <div class="feed__header" id="feedHeader">
+        <h2>Home</h2>
+      </div>
+
+      <!-- tweetbox starts -->
+      <div class="tweetBox" id="tweetBox">
+        <form id="tweetForm">
+          <div class="tweetbox__input" id="tweetInput">
+            <img
+              src="https://i.pinimg.com/originals/a6/58/32/a65832155622ac173337874f02b218fb.png"
+              alt=""
+              id="userInputAvatar"
+            />
+            <input type="text" placeholder="What's happening?" id="tweetTextInput" />
+          </div>
+          <button class="tweetBox__tweetButton" id="tweetSubmitButton">Tweet</button>
+        </form>
+      </div>
+      <!-- tweetbox ends -->
+
+      <!-- Dynamic posts will be loaded here -->
+      <div id="postFeed"></div>
+    </div>
+    <!-- feed ends -->
+
+    <!-- widgets starts -->
+    <div class="widgets" id="widgets">
+      <div class="widgets__input" id="widgetsInput">
+        <span class="material-icons widgets__searchIcon"> search </span>
+        <input type="text" placeholder="Search Twitter" id="searchInput" />
+      </div>
+
+      <div class="widgets__widgetContainer" id="widgetContainer">
+        <h2>What's happening?</h2>
+        <!-- Dynamic content or external API content will be loaded here -->
+      </div>
+    </div>
+    <!-- widgets ends -->
+</body>
+</html>
