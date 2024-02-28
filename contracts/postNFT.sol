@@ -64,4 +64,8 @@ contract PostNFT is ERC721URIStorage, Ownable(msg.sender) {
     function getPostsByAuthor(address author) public view returns (uint256[] memory) {
         return postsByAuthor[author];
     }
+
+    function getTotalPosts() public view returns (uint256) {
+        return _postIds.current();
+    }
 }

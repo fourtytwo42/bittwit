@@ -10,7 +10,7 @@ contract ReactLiquidityPool is Ownable(msg.sender) {
     IERC721 public nftContract;
 
     uint256 public postNFTOwnerFeePercent = 3;
-    uint256 public contractOwnerFeePercent = 1;
+    uint256 public contractOwnerFeePercent = 2;
 
     uint256 private constant BLOCKS_PER_HALVING = 2571; // Approx blocks per hour
 
