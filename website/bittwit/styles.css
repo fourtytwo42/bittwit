@@ -272,3 +272,30 @@ button:hover {
 .pool-info {
   margin-top: 20px; /* Increased margin-top for more spacing */
 }
+
+#uploadPreview {
+    width: 512px;
+    margin-top: 18px;
+}
+
+#imageGeneratorContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.imageGeneratorControls {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: 10px; /* Adjust as needed */
+}
+
+#imagePrompt {
+  flex-grow: 1; /* Ensures the input takes up available space */
+  margin-right: 10px; /* Spacing between input and button */
+}
+
+#generateButton {
+  white-space: nowrap; /* Prevents text wrapping in the button */
+}

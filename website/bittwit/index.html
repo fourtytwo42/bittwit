@@ -17,35 +17,27 @@
     <script src="script.js" defer></script>
 </head>
 <body>
-    <!-- Top Bar for User Info and Connect Wallet Button Start -->
     <header>
         <div id="userProfile">
-
             <span id="userName">Username</span>
         </div>
         <button id="connectButton">Connect to MetaMask</button>
     </header>
-    <!-- Top Bar for User Info and Connect Wallet Button End -->
 
-    <!-- sidebar starts -->
     <div class="sidebar" id="sidebar">
       <i class="fab fa-twitter" id="twitterIcon"></i>
       <div class="sidebarOption" id="homeOption">
         <span class="material-icons"> home </span>
         <h2>Home</h2>
       </div>
-      <!-- Other sidebar options omitted for brevity -->
-      <button class="sidebar__tweet" id="tweetButton">Tweet</button>
+      <button class="sidebar__tweet" id="tweetButton">Posts</button>
     </div>
-    <!-- sidebar ends -->
 
-    <!-- feed starts -->
     <div class="feed" id="feed">
       <div class="feed__header" id="feedHeader">
         <h2>Home</h2>
       </div>
 
-      <!-- tweetbox starts -->
       <div class="tweetBox" id="tweetBox">
         <form id="tweetForm">
           <div class="tweetbox__input" id="tweetInput">
@@ -55,18 +47,16 @@
               id="userInputAvatar"
             />
             <input type="text" placeholder="What's happening?" id="tweetTextInput" />
+            <button type="button" id="addImageButton">Add Image</button>
+            <button type="button" id="generateImageButton">Generate</button>
           </div>
-          <button class="tweetBox__tweetButton" id="tweetSubmitButton">Tweet</button>
+          <button class="tweetBox__tweetButton" id="tweetSubmitButton">Post</button>
         </form>
       </div>
-      <!-- tweetbox ends -->
 
-      <!-- Dynamic posts will be loaded here -->
       <div id="postFeed"></div>
     </div>
-    <!-- feed ends -->
 
-    <!-- widgets starts -->
     <div class="widgets" id="widgets">
       <div class="widgets__input" id="widgetsInput">
         <span class="material-icons widgets__searchIcon"> search </span>
@@ -74,10 +64,17 @@
       </div>
 
       <div class="widgets__widgetContainer" id="widgetContainer">
-        <h2>What's happening?</h2>
-        <!-- Dynamic content or external API content will be loaded here -->
+
+        <div id="imageGeneratorContainer" style="display: none;">
+  <img id="imagePlaceholder" src="placeholder.jpg" alt="Generated Image" style="max-width: 100%;">
+  <div class="imageGeneratorControls">
+    <input type="text" id="imagePrompt" placeholder="Enter prompt for image generation">
+    <button id="generateButton">Generate</button>
+  </div>
+</div>
+        <input type="file" id="imageUpload" style="display: none;">
+        <img id="uploadPreview" style="max-width: 100%; display: none;">
       </div>
     </div>
-    <!-- widgets ends -->
 </body>
 </html>

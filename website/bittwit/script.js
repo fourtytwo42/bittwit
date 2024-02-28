@@ -1314,12 +1314,30 @@ const userAvatar = document.querySelector('#userAvatar');
 const userName = document.querySelector('#userName');
 const postFeed = document.getElementById('postFeed');
 
+
+const addImageButton = document.getElementById('addImageButton');
+const generateImageButton = document.getElementById('generateImageButton');
+const imageUpload = document.getElementById('imageUpload');
+const uploadPreview = document.getElementById('uploadPreview');
+const imageGeneratorContainer = document.getElementById('imageGeneratorContainer');
+const imagePrompt = document.getElementById('imagePrompt');
+const generateButton = document.getElementById('generateButton');
+const tweetForm = document.getElementById('tweetForm');
+const tweetTextInput = document.getElementById('tweetTextInput');
+
+let provider, userContract, postNftContract, reactLiquidityPoolContract;
+let selectedAccount;
+let generatedImageBlob = null;
+
+
+
+
 document.addEventListener('DOMContentLoaded', () => {
     console.log('Document loaded. Initializing...');
     init();
 });
 
-let provider, userContract, postNftContract, reactLiquidityPoolContract;
+
 
 async function init() {
     if (typeof window.ethereum !== 'undefined') {
@@ -1331,15 +1349,23 @@ async function init() {
             await displayUserPosts(account);
             ethereum.on('accountsChanged', handleAccountsChanged);
         }
-        ethereumButton.addEventListener('click', () => connectToMetaMask().then(account => {
-            if (account) {
-                displayUserInfo(account);
-                displayUserPosts(account);
-            }
-        }));
     } else {
         console.error('MetaMask is not installed!');
     }
+
+    addImageButton.addEventListener('click', () => {
+        imageUpload.click();
+    });
+
+    imageUpload.addEventListener('change', handleImageUpload);
+
+    generateImageButton.addEventListener('click', () => {
+        imageGeneratorContainer.style.display = 'block';
+    });
+
+    generateButton.addEventListener('click', handleImageGeneration);
+
+    tweetForm.addEventListener('submit', handlePostSubmission);
 }
 
 async function connectToMetaMaskIfNeeded() {
@@ -1458,6 +1484,156 @@ function attachEventListenersToPost(postId, account) {
     updatePoolInfo(postId, account);
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+function handleImageUpload(event) {
+    const [file] = event.target.files;
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            uploadPreview.src = e.target.result;
+            uploadPreview.style.display = 'block';
+            imageGeneratorContainer.style.display = 'none';
+        };
+        reader.readAsDataURL(file);
+    }
+}
+
+async function handleImageGeneration() {
+    const desc = imagePrompt.value.trim();
+    if (desc) {
+        try {
+            generatedImageBlob = await generateImageBlob(desc);
+            const imageURL = URL.createObjectURL(generatedImageBlob);
+            uploadPreview.src = imageURL;
+            uploadPreview.style.display = 'block';
+            imageGeneratorContainer.style.display = 'none';
+        } catch (error) {
+            console.error("Failed to generate image:", error);
+        }
+    } else {
+        console.log('Please enter a prompt for the image.');
+    }
+}
+
+async function generateImageBlob(desc) {
+    // Your API endpoint to generate images
+    const apiUrl = 'http://165.22.175.90:3000/generate-image';
+
+    console.log('Sending request to your API to generate image.');
+    try {
+        const generationResponse = await fetch(apiUrl, {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                prompt: desc,
+            }),
+        });
+
+        if (!generationResponse.ok) {
+            throw new Error(`HTTP error! status: ${generationResponse.status}`);
+        }
+
+        const data = await generationResponse.json();
+        const imageUrl = data.imageUrl.startsWith('http') ? data.imageUrl : `http://165.22.175.90:3000${data.imageUrl}`;
+        console.log(`Generated image URL: ${imageUrl}`);
+
+        const imageResponse = await fetch(imageUrl);
+        if (!imageResponse.ok) {
+            throw new Error(`HTTP error fetching image! status: ${imageResponse.status}`);
+        }
+
+        generatedImageBlob = await imageResponse.blob();
+        return generatedImageBlob;
+    } catch (error) {
+        console.error('Failed to generate image with error:', error);
+        throw error;
+    }
+}
+
+async function uploadToIPFS(file) {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const apiKey = '60f452a5a3f00328e4ad';
+    const apiSecret = 'c84f6655a0b318a7ea8a3b86717c2150e3fd99836ae4a80863ba8c788d15dcd4';
+
+    try {
+        const response = await fetch('https://api.pinata.cloud/pinning/pinFileToIPFS', {
+            method: 'POST',
+            headers: {
+                'pinata_api_key': apiKey,
+                'pinata_secret_api_key': apiSecret
+            },
+            body: formData,
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            return `https://gateway.pinata.cloud/ipfs/${data.IpfsHash}`;
+        } else {
+            throw new Error(`Failed to upload to IPFS via Pinata: ${response.statusText}`);
+        }
+    } catch (error) {
+        console.error('Error uploading to IPFS via Pinata:', error);
+        throw error;
+    }
+}
+
+async function createPost(uri) {
+    try {
+        const tx = await postNftContract.createPost(uri);
+        await tx.wait();
+        console.log('Post created successfully');
+    } catch (error) {
+        console.error('Error creating post:', error);
+    }
+}
+
+async function handlePostSubmission(event) {
+    event.preventDefault();
+    const postText = tweetTextInput.value;
+    let imageLink = '';
+
+    if (uploadPreview.style.display === 'block') {
+        if (generatedImageBlob) {
+            imageLink = await uploadToIPFS(generatedImageBlob);
+        } else {
+            const file = imageUpload.files[0];
+            imageLink = await uploadToIPFS(file);
+        }
+    }
+
+    const metadata = {
+        description: postText,
+        image: imageLink,
+        attributes: []
+    };
+
+    const metadataLink = await uploadToIPFS(new Blob([JSON.stringify(metadata)], {type: "application/json"}));
+    await createPost(metadataLink);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 async function handleAccountsChanged(accounts) {
     if (accounts.length === 0) {
         console.log('Please connect to MetaMask.');
@@ -1468,6 +1644,10 @@ async function handleAccountsChanged(accounts) {
         await displayUserPosts(account);
     }
 }
+
+
+
+
 
 async function withdrawReact(postId, account) {
     try {
@@ -1554,6 +1734,7 @@ async function reactToPost(postId, reactType) {
         alert("Failed to react to post.");
     }
 }
+
 function createPostElement(metadata, createdAt, postId, username, userAvatar) {
     const postElement = document.createElement('div');
     postElement.classList.add('post');
@@ -1562,26 +1743,28 @@ function createPostElement(metadata, createdAt, postId, username, userAvatar) {
     if (metadata.attributes) {
         const promptAttribute = metadata.attributes.find(attr => attr.trait_type === "Prompt");
         if (promptAttribute) {
-            //promptText = `<p>Prompt: ${promptAttribute.value}</p>`;
+            //promptText = `<p>Prompt: ${promptAttribute.value}</p>`; // Uncommented and ready to use
         }
+    }
+
+    // Conditionally build the image HTML if an image URL exists in the metadata
+    let imageHTML = '';
+    if (metadata.image && metadata.image.trim() !== '') {
+        imageHTML = `<img src="${metadata.image}" alt="Post image" class="post__image">`;
     }
 
     let innerHTMLContent = `
         <div class="post__user-info">
-            
             <div>
-			<button class="follow-btn" onclick="handleFollowClick('${postId}')">Follow</button>
+                <button class="follow-btn" onclick="handleFollowClick('${postId}')">Follow</button>
                 <h3>${username}</h3> <!-- Display username instead of address -->
                 <p class="post__headerSpecial">Posted on: ${new Date(createdAt * 1000).toLocaleString()}</p>
-				<div class="post__content">
-                <p>${metadata.description}</p>
-                ${promptText}
-                <img src="${metadata.image}" alt="Post image" class="post__image">
-				
+                <div class="post__content">
+                    <p>${metadata.description}</p>
+                    ${promptText}
+                    ${imageHTML}
+                </div>
             </div>
-            </div>
-
-            
         </div>
         <div class="post__right"></div>
     `;
@@ -1590,6 +1773,7 @@ function createPostElement(metadata, createdAt, postId, username, userAvatar) {
     console.log(`Post element created for post ID ${postId} with user ${username}`);
     return postElement;
 }
+
 
 // Global function to handle the click event
 function handleFollowClick(postId) {
@@ -1629,16 +1813,7 @@ async function addReactOptionsToPost(postId, postElement, account) {
     postElement.querySelector('.post__right').appendChild(reactOptionsHTML);
 }
 
-/*
-function addPostToFeed(metadata, createdAt, userName) {
-    if (!metadata) return null;
 
-    const postElement = createPostElement(metadata, createdAt, null, userName); // Assuming postId and authorAddress are not needed here or are handled inside createPostElement for this context
-    postFeed.appendChild(postElement);
-
-    return postElement; // Return the created element for further manipulation
-}
-*/
 async function updatePoolInfo(postId, account) {
     try {
         // Fetch pool info for upvotes
