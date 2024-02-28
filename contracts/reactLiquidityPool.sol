@@ -3,65 +3,72 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/token/ERC721/IERC721.sol"; // Import the interface to interact with NFT contract
+import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
-contract ReactLiquidityPool is Ownable {
+contract ReactLiquidityPool is Ownable(msg.sender) {
     IERC20 public reactToken;
-    IERC721 public nftContract; // Variable to hold NFT contract
+    IERC721 public nftContract;
 
-    // Fee percentages
     uint256 public postNFTOwnerFeePercent = 3;
     uint256 public contractOwnerFeePercent = 1;
+
+    uint256 private constant BLOCKS_PER_HALVING = 2571; // Approx blocks per hour
 
     struct Pool {
         uint256 totalShares;
         uint256 totalDeposited;
+        uint256 startBlock; // Start block for this specific pool
         mapping(address => uint256) userShares;
     }
 
     struct NFTPool {
-        mapping(uint256 => Pool) reacts; // Mapping from react sub ID to Pool
+        mapping(uint256 => Pool) reacts;
     }
 
-    mapping(uint256 => NFTPool) private nftPools; // NFT ID to NFTPool
+    mapping(uint256 => NFTPool) private nftPools;
 
-    constructor(address _reactToken, address _nftContract) Ownable(msg.sender) {
+    constructor(address _reactToken, address _nftContract) {
         reactToken = IERC20(_reactToken);
-        nftContract = IERC721(_nftContract); // Initialize NFT contract
+        nftContract = IERC721(_nftContract);
     }
 
-    // Users call this function to deposit ReactTokens and receive shares in return
     function deposit(uint256 nftId, uint256 reactSubId, uint256 amount) external {
         require(amount > 0, "Amount must be positive");
         NFTPool storage nftPool = nftPools[nftId];
         Pool storage pool = nftPool.reacts[reactSubId];
 
-        // Calculate shares to be given for the deposit
+        // Initialize startBlock for the pool upon the first deposit
+        if (pool.totalDeposited == 0) {
+            pool.startBlock = block.number;
+        }
+
         uint256 shares = calculateShares(nftId, reactSubId, amount);
 
-        // Transfer ReactTokens from user to contract
         require(reactToken.transferFrom(msg.sender, address(this), amount), "Transfer failed");
 
-        // Update pool and user information
         pool.totalDeposited += amount;
         pool.userShares[msg.sender] += shares;
         pool.totalShares += shares;
     }
 
-    // Calculate the number of shares a deposit will receive
-    function calculateShares(uint256 nftId, uint256 reactSubId, uint256 amount) public view returns (uint256) {
-        NFTPool storage nftPool = nftPools[nftId];
-        Pool storage pool = nftPool.reacts[reactSubId];
-        if (pool.totalDeposited == 0) {
-            return amount * 2; // Initial multiplier for the very first deposit
-        }
+function calculateShares(uint256 nftId, uint256 reactSubId, uint256 amount) public view returns (uint256) {
+    NFTPool storage nftPool = nftPools[nftId];
+    Pool storage pool = nftPool.reacts[reactSubId];
+    
+    // Instead of checking if pool.totalDeposited > 0, check if the pool's startBlock has been set.
+    // This check will be true for all subsequent deposits after the first one.
+    require(pool.startBlock > 0 || pool.totalDeposited == 0, "Pool has not been initialized or error in pool setup.");
 
-        // Use a diminishing factor to calculate shares
-        uint256 rate = 10000 - (pool.totalDeposited / 10000);
-        return (amount * rate) / 10000;
-    }
+    uint256 halvings = pool.startBlock > 0 ? (block.number - pool.startBlock) / BLOCKS_PER_HALVING : 0;
+    uint256 initialShares = amount * 2; // Initial shares doubled for simplicity
 
-    // Users call this to withdraw their ReactTokens based on their share of the pool
+    // Adjust shares based on how many halvings have occurred since the pool started
+    uint256 adjustedShares = initialShares >> halvings; // Equivalent to dividing by 2^halvings
+
+    return adjustedShares;
+}
+
+
     function withdraw(uint256 nftId, uint256 reactSubId) external {
         NFTPool storage nftPool = nftPools[nftId];
         Pool storage pool = nftPool.reacts[reactSubId];
@@ -73,22 +80,16 @@ contract ReactLiquidityPool is Ownable {
         uint256 contractOwnerFee = (withdrawAmount * contractOwnerFeePercent) / 100;
         uint256 finalWithdrawAmount = withdrawAmount - postNFTOwnerFee - contractOwnerFee;
 
-        // Update pool information
         pool.totalDeposited -= withdrawAmount;
         pool.totalShares -= userShares;
         delete pool.userShares[msg.sender];
 
-        // Transfer fees to NFT owner and contract owner
-        address nftOwner = nftContract.ownerOf(nftId); // Get NFT owner
-        require(reactToken.transfer(nftOwner, postNFTOwnerFee), "PostNFT Owner fee transfer failed");
+        require(reactToken.transfer(nftContract.ownerOf(nftId), postNFTOwnerFee), "PostNFT Owner fee transfer failed");
         require(reactToken.transfer(owner(), contractOwnerFee), "Contract Owner fee transfer failed");
-
-        // Transfer ReactTokens back to user
         require(reactToken.transfer(msg.sender, finalWithdrawAmount), "Transfer failed");
     }
 
-    // Getter functions to access private mapping data
-    function getPoolInfo(uint256 nftId, uint256 reactSubId) external view returns (uint256 totalShares, uint256 totalDeposited) {
+    function getPoolInfo(uint256 nftId, uint256 reactSubId) external view returns (uint256, uint256) {
         NFTPool storage nftPool = nftPools[nftId];
         Pool storage pool = nftPool.reacts[reactSubId];
         return (pool.totalShares, pool.totalDeposited);

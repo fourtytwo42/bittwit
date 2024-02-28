@@ -310,7 +310,7 @@ const contractABI = [
 		"type": "function"
 	}
 ];
-const contractAddress = '0x4bAc50c59611c609c2E3818bd34B22A4F205B80e';
+const contractAddress = '0xc6c0454Ae2c503A59475414F52E626Dd69774DDC';
 
 document.addEventListener('DOMContentLoaded', () => {
     init();

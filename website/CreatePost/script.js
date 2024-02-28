@@ -942,8 +942,9 @@ const postNftABI = [
 	}
 ];
 
-const userManAddress = '0x4bAc50c59611c609c2E3818bd34B22A4F205B80e';
-const postNftAddress = '0x6b6467F88Ef73Df85045498605D6E558AA15DAE2';
+const userManAddress = '0xc6c0454Ae2c503A59475414F52E626Dd69774DDC';
+const postNftAddress = '0xfCC7Da251332FE01604f0A69e611039163488106';
+
 
 const ethereumButton = document.querySelector('#connectButton');
 const registerUserButton = document.querySelector('#registerUserButton');

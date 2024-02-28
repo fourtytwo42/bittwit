@@ -13,9 +13,10 @@ contract UserManagement is Ownable {
     }
 
     mapping(address => UserInfo) private _userInfo;
-    mapping(string => address) private _usernameToAddress; // Map usernames to user addresses
-    address[] private _userAddresses; // To track registered users
-    address private _avatarContract; // Mutable variable for avatar contract
+    mapping(string => address) private _usernameToAddress;
+    mapping(address => address[]) private _userFollows; // Mapping to keep track of follows
+    address[] private _userAddresses;
+    address private _avatarContract;
 
     // Event declarations
     event UserRegistered(address indexed user, string username);
@@ -23,12 +24,13 @@ contract UserManagement is Ownable {
     event AvatarUpdated(address indexed user, uint256 avatarTokenId);
     event UserBanned(address indexed user);
     event AvatarContractUpdated(address avatarContract);
+    event UserFollowed(address indexed user, address indexed followed);
+    event UserUnfollowed(address indexed user, address indexed unfollowed);
 
     constructor() Ownable(msg.sender) {
-        _avatarContract = address(0); // Initialize with a null address
+        _avatarContract = address(0);
     }
 
-    // Function to register user with just a username
     function registerUser(string calldata username) external {
         require(bytes(_userInfo[msg.sender].username).length == 0, "User already registered.");
         require(bytes(username).length >= 4 && bytes(username).length <= 15, "Username must be 4 to 15 characters long.");
@@ -41,12 +43,11 @@ contract UserManagement is Ownable {
             isBanned: false
         });
         _usernameToAddress[username] = msg.sender;
-        _userAddresses.push(msg.sender); // Add user address to the list
+        _userAddresses.push(msg.sender);
 
         emit UserRegistered(msg.sender, username);
     }
 
-    // Function for users to update their avatar
     function updateAvatar(uint256 avatarTokenId) external {
         require(_avatarContract != address(0), "Avatar contract not set.");
         require(bytes(_userInfo[msg.sender].username).length > 0, "User not registered.");
@@ -58,7 +59,6 @@ contract UserManagement is Ownable {
         emit AvatarUpdated(msg.sender, avatarTokenId);
     }
 
-    // Function for users to change their own username
     function changeMyUsername(string calldata newUsername) external {
         UserInfo storage user = _userInfo[msg.sender];
         require(bytes(user.username).length > 0, "User not registered.");
@@ -66,13 +66,8 @@ contract UserManagement is Ownable {
         require(_usernameToAddress[newUsername] == address(0), "Username already taken.");
         require(!user.isBanned, "Banned users cannot change their username.");
 
-        // Remove the old username mapping
         delete _usernameToAddress[user.username];
-
-        // Update the user's username in the UserInfo mapping
         user.username = newUsername;
-
-        // Add the new username mapping
         _usernameToAddress[newUsername] = msg.sender;
 
         emit UsernameChanged(msg.sender, newUsername);
@@ -84,29 +79,63 @@ contract UserManagement is Ownable {
         emit UserBanned(user);
     }
 
-    // Function to set the avatar contract address by the owner
     function setAvatarContract(address avatarContractAddress) external onlyOwner {
         require(avatarContractAddress != address(0), "Avatar contract address cannot be the zero address.");
         _avatarContract = avatarContractAddress;
         emit AvatarContractUpdated(avatarContractAddress);
     }
 
-    // Function to get user info
     function getUserInfo(address user) external view returns (UserInfo memory) {
         require(!_userInfo[user].isBanned, "User is banned.");
         return _userInfo[user];
     }
 
-    // Function to get total number of users
     function getTotalUsers() external view returns (uint256) {
         return _userAddresses.length;
     }
 
-    // Function to get user address by username
-    function getAddressByUsername(string calldata username) external view returns (address) {
-        require(_usernameToAddress[username] != address(0), "Username not found.");
-        address userAddress = _usernameToAddress[username];
-        require(!_userInfo[userAddress].isBanned, "User is banned.");
-        return userAddress;
+    // Follow functionality
+    function followUser(address userToFollow) external {
+        require(userToFollow != msg.sender, "Cannot follow yourself.");
+        require(!_userInfo[msg.sender].isBanned, "Banned users cannot follow.");
+        require(!_userInfo[userToFollow].isBanned, "Cannot follow a banned user.");
+
+        _userFollows[msg.sender].push(userToFollow);
+
+        emit UserFollowed(msg.sender, userToFollow);
+    }
+
+    function unfollowUser(address userToUnfollow) external {
+        require(userToUnfollow != msg.sender, "Cannot unfollow yourself.");
+        int256 index = _findFollowIndex(msg.sender, userToUnfollow);
+
+        require(index >= 0, "User not followed.");
+
+        _removeFollowAtIndex(msg.sender, uint256(index));
+
+        emit UserUnfollowed(msg.sender, userToUnfollow);
+    }
+
+    function getFollows(address user) external view returns (address[] memory) {
+        return _userFollows[user];
+    }
+
+    // Private helper functions
+    function _findFollowIndex(address follower, address followee) private view returns (int256) {
+        for (uint256 i = 0; i < _userFollows[follower].length; i++) {
+            if (_userFollows[follower][i] == followee) {
+                return int256(i);
+            }
+        }
+        return -1; // Not found
+    }
+
+    function _removeFollowAtIndex(address follower, uint256 index) private {
+        require(index < _userFollows[follower].length, "Index out of bounds.");
+
+        for (uint256 i = index; i < _userFollows[follower].length - 1; i++) {
+            _userFollows[follower][i] = _userFollows[follower][i + 1];
+        }
+        _userFollows[follower].pop();
     }
 }

@@ -1,21 +1,239 @@
 
 
 const userManABI = [
-	
+	{
+		"inputs": [],
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
 	{
 		"inputs": [
 			{
+				"internalType": "address",
+				"name": "owner",
+				"type": "address"
+			}
+		],
+		"name": "OwnableInvalidOwner",
+		"type": "error"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "account",
+				"type": "address"
+			}
+		],
+		"name": "OwnableUnauthorizedAccount",
+		"type": "error"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "avatarContract",
+				"type": "address"
+			}
+		],
+		"name": "AvatarContractUpdated",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "user",
+				"type": "address"
+			},
+			{
+				"indexed": false,
 				"internalType": "uint256",
-				"name": "index",
+				"name": "avatarTokenId",
 				"type": "uint256"
 			}
 		],
-		"name": "getUserByIndex",
-		"outputs": [
+		"name": "AvatarUpdated",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "previousOwner",
+				"type": "address"
+			},
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "newOwner",
+				"type": "address"
+			}
+		],
+		"name": "OwnershipTransferred",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "user",
+				"type": "address"
+			}
+		],
+		"name": "UserBanned",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "user",
+				"type": "address"
+			},
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "followed",
+				"type": "address"
+			}
+		],
+		"name": "UserFollowed",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "user",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "string",
+				"name": "username",
+				"type": "string"
+			}
+		],
+		"name": "UserRegistered",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "user",
+				"type": "address"
+			},
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "unfollowed",
+				"type": "address"
+			}
+		],
+		"name": "UserUnfollowed",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "user",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "string",
+				"name": "newUsername",
+				"type": "string"
+			}
+		],
+		"name": "UsernameChanged",
+		"type": "event"
+	},
+	{
+		"inputs": [
 			{
 				"internalType": "address",
-				"name": "",
+				"name": "user",
 				"type": "address"
+			}
+		],
+		"name": "banUser",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "newUsername",
+				"type": "string"
+			}
+		],
+		"name": "changeMyUsername",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "userToFollow",
+				"type": "address"
+			}
+		],
+		"name": "followUser",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "user",
+				"type": "address"
+			}
+		],
+		"name": "getFollows",
+		"outputs": [
+			{
+				"internalType": "address[]",
+				"name": "",
+				"type": "address[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getTotalUsers",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
 			}
 		],
 		"stateMutability": "view",
@@ -39,24 +257,14 @@ const userManABI = [
 						"type": "string"
 					},
 					{
-						"internalType": "address",
-						"name": "avatarContract",
-						"type": "address"
-					},
-					{
 						"internalType": "uint256",
 						"name": "avatarTokenId",
 						"type": "uint256"
 					},
 					{
 						"internalType": "bool",
-						"name": "isERC1155",
+						"name": "isBanned",
 						"type": "bool"
-					},
-					{
-						"internalType": "uint256",
-						"name": "avatarAmount",
-						"type": "uint256"
 					}
 				],
 				"internalType": "struct UserManagement.UserInfo",
@@ -66,33 +274,95 @@ const userManABI = [
 		],
 		"stateMutability": "view",
 		"type": "function"
-	}
-];
-
-const reactLiquidityPoolABI = [
+	},
+	{
+		"inputs": [],
+		"name": "owner",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
 	{
 		"inputs": [
 			{
-				"internalType": "uint256",
-				"name": "nftId",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "reactSubId",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "amount",
-				"type": "uint256"
+				"internalType": "string",
+				"name": "username",
+				"type": "string"
 			}
 		],
-		"name": "deposit",
+		"name": "registerUser",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
 	},
+	{
+		"inputs": [],
+		"name": "renounceOwnership",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "avatarContractAddress",
+				"type": "address"
+			}
+		],
+		"name": "setAvatarContract",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "newOwner",
+				"type": "address"
+			}
+		],
+		"name": "transferOwnership",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "userToUnfollow",
+				"type": "address"
+			}
+		],
+		"name": "unfollowUser",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "avatarTokenId",
+				"type": "uint256"
+			}
+		],
+		"name": "updateAvatar",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	}
+];
+
+const reactLiquidityPoolABI = [
 	{
 		"inputs": [
 			{
@@ -151,44 +421,6 @@ const reactLiquidityPoolABI = [
 		"type": "event"
 	},
 	{
-		"inputs": [],
-		"name": "renounceOwnership",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "newOwner",
-				"type": "address"
-			}
-		],
-		"name": "transferOwnership",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "nftId",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "reactSubId",
-				"type": "uint256"
-			}
-		],
-		"name": "withdraw",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
 		"inputs": [
 			{
 				"internalType": "uint256",
@@ -228,6 +460,29 @@ const reactLiquidityPoolABI = [
 			}
 		],
 		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "nftId",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "reactSubId",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "amount",
+				"type": "uint256"
+			}
+		],
+		"name": "deposit",
+		"outputs": [],
+		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
@@ -338,6 +593,44 @@ const reactLiquidityPoolABI = [
 			}
 		],
 		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "renounceOwnership",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "newOwner",
+				"type": "address"
+			}
+		],
+		"name": "transferOwnership",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "nftId",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "reactSubId",
+				"type": "uint256"
+			}
+		],
+		"name": "withdraw",
+		"outputs": [],
+		"stateMutability": "nonpayable",
 		"type": "function"
 	}
 ];
@@ -1011,9 +1304,9 @@ const erc20ABI = [
     }
 ];
 
-const userManAddress = '0x4bAc50c59611c609c2E3818bd34B22A4F205B80e';
-const postNftAddress = '0x6b6467F88Ef73Df85045498605D6E558AA15DAE2';
-const reactLiquidityPoolAddress = '0xe920A5A84b93653E268a979b1814B3903D8f60Bf';
+const userManAddress = '0xc6c0454Ae2c503A59475414F52E626Dd69774DDC';
+const postNftAddress = '0xfCC7Da251332FE01604f0A69e611039163488106';
+const reactLiquidityPoolAddress = '0x375682DDbb9dA42A2e285402885Ac5D246Da31E9';
 const reactTokenAddress = '0xd9941136c56C5Bb64e3ab63e4Def6a4142c0654A';
 
 const ethereumButton = document.querySelector('#connectButton');
@@ -1123,7 +1416,7 @@ async function displayUserPosts(address) {
         const postIds = await postNftContract.getPostsByAuthor(address);
         
         for (const postId of postIds) {
-			const username = await getAuthorByPostID(postId); // Fetch the username
+			const username = await getAuthorNameByPostID(postId); // Fetch the username
             const post = await postNftContract.getPost(postId);
             if (post[2]) {
                 const metadata = await fetchPostMetadata(post[2]);
@@ -1277,12 +1570,14 @@ function createPostElement(metadata, createdAt, postId, username, userAvatar) {
         <div class="post__user-info">
             
             <div>
+			<button class="follow-btn" onclick="handleFollowClick('${postId}')">Follow</button>
                 <h3>${username}</h3> <!-- Display username instead of address -->
                 <p class="post__headerSpecial">Posted on: ${new Date(createdAt * 1000).toLocaleString()}</p>
 				<div class="post__content">
                 <p>${metadata.description}</p>
                 ${promptText}
                 <img src="${metadata.image}" alt="Post image" class="post__image">
+				
             </div>
             </div>
 
@@ -1294,6 +1589,26 @@ function createPostElement(metadata, createdAt, postId, username, userAvatar) {
     postElement.innerHTML = innerHTMLContent;
     console.log(`Post element created for post ID ${postId} with user ${username}`);
     return postElement;
+}
+
+// Global function to handle the click event
+function handleFollowClick(postId) {
+    // Call the async function
+    followUserAsync(postId);
+}
+
+async function followUserAsync(postId) {
+    try {
+        const userToFollowAddress = await getAuthorAddressByPostID(postId);
+		console.log(userToFollowAddress);
+        if (userToFollowAddress) {
+            await followUser(userToFollowAddress);
+        } else {
+            console.error('Could not fetch user to follow address.');
+        }
+    } catch (error) {
+        console.error('Error following user:', error);
+    }
 }
 
 async function addReactOptionsToPost(postId, postElement, account) {
@@ -1414,7 +1729,7 @@ async function attachReactOptionsToPost(postId, postElement, account) {
     }
 }
 
-async function getAuthorByPostID(postId) {
+async function getAuthorNameByPostID(postId) {
     try {
         const postInfo = await postNftContract.getPost(postId);
         // postInfo should be an array with post details, where the second element is the author's address
@@ -1428,3 +1743,32 @@ async function getAuthorByPostID(postId) {
     }
 }
 
+async function getAuthorAddressByPostID(postId) {
+    try {
+        const postInfo = await postNftContract.getPost(postId);
+        // postInfo should be an array with post details, where the second element is the author's address
+        const authorAddress = postInfo[1]; // Assuming the second return value from getPost is the author's address
+		const userInfo = await userContract.getUserInfo(authorAddress);
+        console.log('Author Address:', authorAddress);
+        return authorAddress;
+    } catch (error) {
+        console.error('Error fetching author by post ID:', error);
+        return null; // Or handle the error as per your application's needs
+    }
+}
+
+async function followUser(userToFollowAddress) {
+    console.log(`Attempting to follow user at address: ${userToFollowAddress}`);
+    try {
+        // Ensure the user has connected their wallet
+        await provider.send("eth_requestAccounts", []);
+
+        // Call the followUser function of the smart contract
+        const tx = await userContract.followUser(userToFollowAddress);
+        await tx.wait(); // Wait for the transaction to be mined
+
+        console.log(`Following user at address: ${userToFollowAddress}`);
+    } catch (error) {
+        console.error('Error following user:', error);
+    }
+}
