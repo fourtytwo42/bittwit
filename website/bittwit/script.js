@@ -1046,6 +1046,19 @@ const postNftABI = [
 		"type": "function"
 	},
 	{
+		"inputs": [],
+		"name": "getTotalPosts",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
 		"inputs": [
 			{
 				"internalType": "address",
@@ -1305,8 +1318,8 @@ const erc20ABI = [
 ];
 
 const userManAddress = '0xc6c0454Ae2c503A59475414F52E626Dd69774DDC';
-const postNftAddress = '0xfCC7Da251332FE01604f0A69e611039163488106';
-const reactLiquidityPoolAddress = '0x375682DDbb9dA42A2e285402885Ac5D246Da31E9';
+const postNftAddress = '0x1fa47a6DE7cb2e25201586ceC0e904fd5F86e92F';
+const reactLiquidityPoolAddress = '0x70fFc9168F48228C6b662bbbF839abbC95F7AbC4';
 const reactTokenAddress = '0xd9941136c56C5Bb64e3ab63e4Def6a4142c0654A';
 
 const ethereumButton = document.querySelector('#connectButton');
@@ -1441,6 +1454,39 @@ async function displayUserInfo(address) {
         console.error('Error fetching user info:', error);
     }
 }
+async function displayLatestPosts() {
+    try {
+        // Clear the post feed before adding new posts
+        postFeed.innerHTML = '';
+
+        const totalPosts = await postNftContract.getTotalPosts();
+        // Calculate the starting post ID (ensure we don't go below 1)
+        const startPostId = Math.max(1, totalPosts - 19);
+        // Display up to the top 20 newest posts
+        for (let postId = totalPosts; postId >= startPostId; postId--) {
+            try {
+                const postInfo = await postNftContract.getPost(postId);
+                if (postInfo) {
+                    const postNftUri = postInfo[2]; // Assuming the URI is the third returned value
+                    const postNftMetadata = await fetchPostMetadata(postNftUri);
+                    if (postNftMetadata && postNftMetadata.image) {
+                        const username = await getAuthorNameByPostID(postId); // Fetch the username
+                        // Assuming userAvatar is a placeholder or retrieved similarly
+                        const userAvatar = postNftMetadata.image; // Placeholder, adjust as necessary
+                        const postElement = createPostElement(postNftMetadata, postInfo[3], postId, username, userAvatar);
+                        postFeed.appendChild(postElement);
+                        attachReactOptionsToPost(postId, postElement, postInfo[1]); // Assuming postInfo[1] is the author's address
+                    }
+                }
+            } catch (error) {
+                console.error(`Error fetching post ${postId}:`, error);
+            }
+        }
+    } catch (error) {
+        console.error('Error fetching latest posts:', error);
+    }
+}
+
 
 async function displayFriendsPosts(address) {
     try {
@@ -1449,32 +1495,49 @@ async function displayFriendsPosts(address) {
 
         // Fetch the list of friends (followed users)
         const friendsList = await userContract.getFollows(address);
+        const postsPerFriend = await Promise.all(friendsList.map(async (friendAddress) => {
+            const postIds = await postNftContract.getPostsByAuthor(friendAddress);
+            return postIds.reverse(); // Reverse to start with the newest
+        }));
 
-        // Iterate through each friend and fetch their posts
-        for (const friendAddress of friendsList) {
-            let postIds = await postNftContract.getPostsByAuthor(friendAddress);
-            
-            // Create a new array from the original and reverse it
-            postIds = [...postIds].reverse();
+        let postsDisplayed = 0;
+        let postIndex = 0;
 
-            for (const postId of postIds) {
-                const username = await getAuthorNameByPostID(postId); // Fetch the username
-                const post = await postNftContract.getPost(postId);
-                if (post[2]) {
-                    const metadata = await fetchPostMetadata(post[2]);
-                    if (metadata) {
-                        // Pass the username instead of the address
-                        const postElement = createPostElement(metadata, post[3], postId, username, userAvatar); // Assuming userAvatar is retrieved similarly
-                        postFeed.appendChild(postElement);
-                        attachReactOptionsToPost(postId, postElement, friendAddress);
+        while (postsDisplayed < 20) {
+            let roundDisplayed = 0;
+
+            for (const friendPosts of postsPerFriend) {
+                if (postIndex < friendPosts.length) {
+                    const postId = friendPosts[postIndex];
+                    const post = await postNftContract.getPost(postId);
+                    if (post[2]) { // Check if post has metadata URI
+                        const metadata = await fetchPostMetadata(post[2]);
+                        if (metadata) {
+                            const username = await getAuthorNameByPostID(postId); // Fetch the username
+                            // Assuming userAvatar is retrieved similarly
+                            const userAvatar = metadata.image; // Placeholder, adjust as necessary
+                            const postElement = createPostElement(metadata, post[3], postId, username, userAvatar);
+                            postFeed.appendChild(postElement);
+                            attachReactOptionsToPost(postId, postElement, post[1]); // Assuming post[1] is the author's address
+                            roundDisplayed++;
+                        }
                     }
                 }
+            }
+
+            postsDisplayed += roundDisplayed;
+            postIndex++;
+
+            // Break if no posts were added in this round to prevent infinite loop
+            if (roundDisplayed === 0) {
+                break;
             }
         }
     } catch (error) {
         console.error('Error fetching posts:', error);
     }
 }
+
 
 
 
