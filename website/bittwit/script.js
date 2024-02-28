@@ -1359,9 +1359,13 @@ async function updatePoolInfo(postId, account) {
 
 async function attachReactOptionsToPost(postId, postElement, account) {
     try {
-        const poolInfo = await reactLiquidityPoolContract.getPoolInfo(postId, 1); // Example for one react type
-        const userShares = await reactLiquidityPoolContract.getUserShares(postId, 1, account);
+        // Fetch pool info for both upvotes and downvotes
+        const upvoteInfo = await reactLiquidityPoolContract.getPoolInfo(postId, 1);
+        const downvoteInfo = await reactLiquidityPoolContract.getPoolInfo(postId, 0);
+        const upvoteShares = await reactLiquidityPoolContract.getUserShares(postId, 1, account);
+        const downvoteShares = await reactLiquidityPoolContract.getUserShares(postId, 0, account);
 
+        // Create a container for the react options and pool stats
         const reactOptionsHTML = document.createElement('div');
         reactOptionsHTML.classList.add('react-options');
 
@@ -1378,15 +1382,28 @@ async function attachReactOptionsToPost(postId, postElement, account) {
         reactOptionsHTML.appendChild(upvoteButton);
         reactOptionsHTML.appendChild(downvoteButton);
 
-        // Pool info
-        const poolInfoDiv = document.createElement('div');
-        poolInfoDiv.id = `poolInfo-${postId}`;
-        poolInfoDiv.innerHTML = `
-            <p>Total Shares: ${poolInfo.totalShares.toString()}</p>
-            <p>Your Shares: ${userShares.toString()}</p>
+        // Create a visually appealing stats display for both pools
+        const poolStatsHTML = document.createElement('div');
+        poolStatsHTML.classList.add('pool-stats');
+        poolStatsHTML.innerHTML = `
+            <div class="pool-stats__item">
+                <h4>Upvote Pool</h4>
+                <p>Total Shares: ${upvoteInfo.totalShares.toString()}</p>
+                <p>Your Shares: ${upvoteShares.toString()}</p>
+                <p>Total Deposited: ${ethers.utils.formatUnits(upvoteInfo.totalDeposited, 18)} REACT</p>
+            </div>
+            <div class="pool-stats__item">
+                <h4>Downvote Pool</h4>
+                <p>Total Shares: ${downvoteInfo.totalShares.toString()}</p>
+                <p>Your Shares: ${downvoteShares.toString()}</p>
+                <p>Total Deposited: ${ethers.utils.formatUnits(downvoteInfo.totalDeposited, 18)} REACT</p>
+            </div>
         `;
-        reactOptionsHTML.appendChild(poolInfoDiv);
 
+        // Append the pool stats to the reactOptionsHTML
+        reactOptionsHTML.appendChild(poolStatsHTML);
+
+        // Append the entire reactOptionsHTML to the postElement
         postElement.appendChild(reactOptionsHTML);
 
         // Attach event listeners after elements are added to the DOM
