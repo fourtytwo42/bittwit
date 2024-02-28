@@ -28,9 +28,10 @@
       <i class="fab fa-twitter" id="twitterIcon"></i>
       <div class="sidebarOption" id="homeOption">
         <span class="material-icons"> home </span>
-        <h2>Home</h2>
+        <h2 Onclick="displayFriendsPosts(userAccount)">Home</h2>
       </div>
-      <button class="sidebar__tweet" id="tweetButton">Posts</button>
+	  <button class="sidebar__tweet" id="profileButton" Onclick="displayUserPosts(userAccount)">Profile</button>
+	  <button class="sidebar__tweet" id="discoverButton">Discover</button>
     </div>
 
     <div class="feed" id="feed">

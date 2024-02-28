@@ -1326,7 +1326,7 @@ const tweetForm = document.getElementById('tweetForm');
 const tweetTextInput = document.getElementById('tweetTextInput');
 
 let provider, userContract, postNftContract, reactLiquidityPoolContract;
-let selectedAccount;
+let userAccount;
 let generatedImageBlob = null;
 
 
@@ -1355,12 +1355,20 @@ async function init() {
 
     addImageButton.addEventListener('click', () => {
         imageUpload.click();
+		generateImageButton.style.display = 'none';
     });
 
-    imageUpload.addEventListener('change', handleImageUpload);
+    imageUpload.addEventListener('change', (event) => {
+		handleImageUpload(event);
+		imageGeneratorContainer.style.display = 'block';
+		
+	});
+	
 
     generateImageButton.addEventListener('click', () => {
         imageGeneratorContainer.style.display = 'block';
+		addImageButton.style.display = 'none';
+		generateImageButton.style.display = 'none';
     });
 
     generateButton.addEventListener('click', handleImageGeneration);
@@ -1374,6 +1382,7 @@ async function connectToMetaMaskIfNeeded() {
         if (accounts.length > 0) {
             console.log(`Found connected account: ${accounts[0]}`);
             ethereumButton.innerText = 'Connected';
+			userAccount = accounts[0]
             return accounts[0];
         } else {
             console.log('MetaMask is installed but not connected');
@@ -1391,6 +1400,7 @@ async function connectToMetaMask() {
             const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
             console.log(`Connected to account: ${accounts[0]}`);
             ethereumButton.innerText = 'Connected';
+			userAccount = accounts[0]
             return accounts[0];
         } catch (error) {
             console.error('Error during account request:', error);
@@ -1432,6 +1442,41 @@ async function displayUserInfo(address) {
     }
 }
 
+async function displayFriendsPosts(address) {
+    try {
+        // Clear the post feed before adding new posts
+        postFeed.innerHTML = '';
+
+        // Fetch the list of friends (followed users)
+        const friendsList = await userContract.getFollows(address);
+
+        // Iterate through each friend and fetch their posts
+        for (const friendAddress of friendsList) {
+            let postIds = await postNftContract.getPostsByAuthor(friendAddress);
+            
+            // Create a new array from the original and reverse it
+            postIds = [...postIds].reverse();
+
+            for (const postId of postIds) {
+                const username = await getAuthorNameByPostID(postId); // Fetch the username
+                const post = await postNftContract.getPost(postId);
+                if (post[2]) {
+                    const metadata = await fetchPostMetadata(post[2]);
+                    if (metadata) {
+                        // Pass the username instead of the address
+                        const postElement = createPostElement(metadata, post[3], postId, username, userAvatar); // Assuming userAvatar is retrieved similarly
+                        postFeed.appendChild(postElement);
+                        attachReactOptionsToPost(postId, postElement, friendAddress);
+                    }
+                }
+            }
+        }
+    } catch (error) {
+        console.error('Error fetching posts:', error);
+    }
+}
+
+
 
 
 
@@ -1439,10 +1484,16 @@ async function displayUserInfo(address) {
 
 async function displayUserPosts(address) {
     try {
-        const postIds = await postNftContract.getPostsByAuthor(address);
+        // Clear the post feed before adding new posts
+        postFeed.innerHTML = '';
+
+        let postIds = await postNftContract.getPostsByAuthor(address);
         
+        // Create a new array from the original and reverse it
+        postIds = [...postIds].reverse();
+
         for (const postId of postIds) {
-			const username = await getAuthorNameByPostID(postId); // Fetch the username
+            const username = await getAuthorNameByPostID(postId); // Fetch the username
             const post = await postNftContract.getPost(postId);
             if (post[2]) {
                 const metadata = await fetchPostMetadata(post[2]);
@@ -1458,6 +1509,7 @@ async function displayUserPosts(address) {
         console.error('Error fetching posts:', error);
     }
 }
+
 
 
 
@@ -1492,9 +1544,11 @@ function handleImageUpload(event) {
     if (file) {
         const reader = new FileReader();
         reader.onload = function(e) {
-            uploadPreview.src = e.target.result;
-            uploadPreview.style.display = 'block';
-            imageGeneratorContainer.style.display = 'none';
+            imagePlaceholder.src = e.target.result;
+            imagePlaceholder.style.display = 'block';
+            uploadPreview.style.display = 'none'; // Ensure this is consistent with handleImageUpload
+            imagePrompt.style.display = 'none'; // Hide the text prompt and generate button after generation
+			generateButton.style.display = 'none';
         };
         reader.readAsDataURL(file);
     }
@@ -1503,19 +1557,27 @@ function handleImageUpload(event) {
 async function handleImageGeneration() {
     const desc = imagePrompt.value.trim();
     if (desc) {
+        // Display loading.gif while waiting for the image to generate
+        imagePlaceholder.src = 'loading.gif'; // Update the path if necessary
+        imagePlaceholder.style.display = 'block';
+
         try {
             generatedImageBlob = await generateImageBlob(desc);
             const imageURL = URL.createObjectURL(generatedImageBlob);
-            uploadPreview.src = imageURL;
-            uploadPreview.style.display = 'block';
-            imageGeneratorContainer.style.display = 'none';
+            // Once the image is generated, update the placeholder with the generated image
+            imagePlaceholder.src = imageURL;
+            uploadPreview.style.display = 'none'; // Ensure this is consistent with handleImageUpload
+            // Optionally hide the generator container, uncomment if needed
+            // imageGeneratorContainer.style.display = 'none';
         } catch (error) {
             console.error("Failed to generate image:", error);
+            // Consider displaying an error message or reverting the placeholder image here
         }
     } else {
         console.log('Please enter a prompt for the image.');
     }
 }
+
 
 async function generateImageBlob(desc) {
     // Your API endpoint to generate images
@@ -1586,8 +1648,9 @@ async function uploadToIPFS(file) {
 async function createPost(uri) {
     try {
         const tx = await postNftContract.createPost(uri);
-        await tx.wait();
+        await tx.wait(); // Wait for the transaction to be confirmed
         console.log('Post created successfully');
+        location.reload(); // Refresh the page after successful post creation
     } catch (error) {
         console.error('Error creating post:', error);
     }
@@ -1598,12 +1661,16 @@ async function handlePostSubmission(event) {
     const postText = tweetTextInput.value;
     let imageLink = '';
 
-    if (uploadPreview.style.display === 'block') {
+    if (uploadPreview.style.display === 'block' || imagePlaceholder.style.display === 'block') {
+        let blobToUpload = null;
         if (generatedImageBlob) {
-            imageLink = await uploadToIPFS(generatedImageBlob);
-        } else {
-            const file = imageUpload.files[0];
-            imageLink = await uploadToIPFS(file);
+            blobToUpload = generatedImageBlob;
+        } else if (imageUpload.files[0]) {
+            blobToUpload = imageUpload.files[0];
+        }
+
+        if (blobToUpload) {
+            imageLink = await uploadToIPFS(blobToUpload);
         }
     }
 
@@ -1616,8 +1683,6 @@ async function handlePostSubmission(event) {
     const metadataLink = await uploadToIPFS(new Blob([JSON.stringify(metadata)], {type: "application/json"}));
     await createPost(metadataLink);
 }
-
-
 
 
 
@@ -1794,7 +1859,7 @@ async function followUserAsync(postId) {
         console.error('Error following user:', error);
     }
 }
-
+/*
 async function addReactOptionsToPost(postId, postElement, account) {
     const poolInfo = await reactLiquidityPoolContract.getPoolInfo(postId, 1); // Example for one react type
     const userShares = await reactLiquidityPoolContract.getUserShares(postId, 1, account);
@@ -1812,7 +1877,7 @@ async function addReactOptionsToPost(postId, postElement, account) {
 
     postElement.querySelector('.post__right').appendChild(reactOptionsHTML);
 }
-
+*/
 
 async function updatePoolInfo(postId, account) {
     try {

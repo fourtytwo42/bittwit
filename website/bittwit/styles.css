@@ -100,7 +100,6 @@ button:hover {
   font-weight: 900;
   border-radius: 30px;
   height: 50px;
-  margin-top: 20px;
   width: 100%;
 }
 
@@ -108,8 +107,16 @@ button:hover {
   flex: 0.5; /* Adjust this value as needed */
   border-right: 1px solid var(--twitter-background);
   min-width: fit-content;
-  max-width: 45%; /* Adjusted from 60% to make the feed narrower */
+  max-width: 40%; /* Adjusted from 60% to make the feed narrower */
   overflow-y: scroll;
+}
+
+.widgets {
+  flex: 0.5; /* Adjust this value as needed */
+  border-right: 1px solid var(--twitter-background);
+  min-width: fit-content;
+  max-width: 25%; /* Adjusted from 60% to make the feed narrower */
+
 }
 
 
@@ -273,7 +280,7 @@ button:hover {
   margin-top: 20px; /* Increased margin-top for more spacing */
 }
 
-#uploadPreview {
+#imagePlaceholder {
     width: 512px;
     margin-top: 18px;
 }
@@ -282,6 +289,7 @@ button:hover {
   display: flex;
   flex-direction: column;
   align-items: center;
+  margin-top: 50px; /* Adjust as needed */
 }
 
 .imageGeneratorControls {
