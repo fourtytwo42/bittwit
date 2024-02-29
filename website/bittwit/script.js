@@ -1343,18 +1343,25 @@ let userAccount;
 let generatedImageBlob = null;
 
 
-
-
 document.addEventListener('DOMContentLoaded', () => {
     console.log('Document loaded. Initializing...');
     init();
 });
 
-
-
 async function init() {
     if (typeof window.ethereum !== 'undefined') {
         console.log('MetaMask is detected.');
+        // Attach the event listener here to ensure it's set after checking for MetaMask
+        ethereumButton.addEventListener('click', async () => {
+            const account = await connectToMetaMask();
+            if (account) {
+                initContracts();
+                await displayUserInfo(account);
+                await displayUserPosts(account);
+                ethereum.on('accountsChanged', handleAccountsChanged);
+            }
+        });
+
         const account = await connectToMetaMaskIfNeeded();
         if (account) {
             initContracts();
@@ -1387,6 +1394,7 @@ async function init() {
     generateButton.addEventListener('click', handleImageGeneration);
 
     tweetForm.addEventListener('submit', handlePostSubmission);
+	
 }
 
 async function connectToMetaMaskIfNeeded() {
@@ -1395,7 +1403,8 @@ async function connectToMetaMaskIfNeeded() {
         if (accounts.length > 0) {
             console.log(`Found connected account: ${accounts[0]}`);
             ethereumButton.innerText = 'Connected';
-			userAccount = accounts[0]
+			userAccount = accounts[0];
+			
             return accounts[0];
         } else {
             console.log('MetaMask is installed but not connected');
@@ -1413,7 +1422,8 @@ async function connectToMetaMask() {
             const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
             console.log(`Connected to account: ${accounts[0]}`);
             ethereumButton.innerText = 'Connected';
-			userAccount = accounts[0]
+			userAccount = accounts[0];
+			
             return accounts[0];
         } catch (error) {
             console.error('Error during account request:', error);
@@ -1432,6 +1442,7 @@ function initContracts() {
     postNftContract = new ethers.Contract(postNftAddress, postNftABI, signer);
     reactLiquidityPoolContract = new ethers.Contract(reactLiquidityPoolAddress, reactLiquidityPoolABI, signer);
     console.log('Contracts initialized.');
+	checkAndDisplayRegistration(userAccount);
 }
 
 async function displayUserInfo(address) {
@@ -1487,7 +1498,6 @@ async function displayLatestPosts() {
     }
 }
 
-
 async function displayFriendsPosts(address) {
     try {
         // Clear the post feed before adding new posts
@@ -1497,7 +1507,8 @@ async function displayFriendsPosts(address) {
         const friendsList = await userContract.getFollows(address);
         const postsPerFriend = await Promise.all(friendsList.map(async (friendAddress) => {
             const postIds = await postNftContract.getPostsByAuthor(friendAddress);
-            return postIds.reverse(); // Reverse to start with the newest
+            // Create a copy of the array before reversing
+            return [...postIds].reverse(); // Use spread operator to create a copy
         }));
 
         let postsDisplayed = 0;
@@ -1510,6 +1521,7 @@ async function displayFriendsPosts(address) {
                 if (postIndex < friendPosts.length) {
                     const postId = friendPosts[postIndex];
                     const post = await postNftContract.getPost(postId);
+                    console.log(postId + ", " + post);
                     if (post[2]) { // Check if post has metadata URI
                         const metadata = await fetchPostMetadata(post[2]);
                         if (metadata) {
@@ -1537,8 +1549,6 @@ async function displayFriendsPosts(address) {
         console.error('Error fetching posts:', error);
     }
 }
-
-
 
 
 
@@ -1987,39 +1997,43 @@ async function attachReactOptionsToPost(postId, postElement, account) {
         const reactOptionsHTML = document.createElement('div');
         reactOptionsHTML.classList.add('react-options');
 
+        // Create button and stats containers
+        const upvoteContainer = document.createElement('div');
+        upvoteContainer.classList.add('vote-container');
+        const downvoteContainer = document.createElement('div');
+        downvoteContainer.classList.add('vote-container');
+
         // Create buttons with unique IDs using postId to ensure uniqueness
         const upvoteButton = document.createElement('button');
         upvoteButton.textContent = 'Upvote';
         upvoteButton.id = `upvote-${postId}`;
-        
         const downvoteButton = document.createElement('button');
         downvoteButton.textContent = 'Downvote';
         downvoteButton.id = `downvote-${postId}`;
 
-        // Append buttons to reactOptionsHTML
-        reactOptionsHTML.appendChild(upvoteButton);
-        reactOptionsHTML.appendChild(downvoteButton);
-
-        // Create a visually appealing stats display for both pools
-        const poolStatsHTML = document.createElement('div');
-        poolStatsHTML.classList.add('pool-stats');
-        poolStatsHTML.innerHTML = `
-            <div class="pool-stats__item">
-                <h4>Upvote Pool</h4>
-                <p>Total Shares: ${upvoteInfo.totalShares.toString()}</p>
-                <p>Your Shares: ${upvoteShares.toString()}</p>
-                <p>Total Deposited: ${ethers.utils.formatUnits(upvoteInfo.totalDeposited, 18)} REACT</p>
-            </div>
-            <div class="pool-stats__item">
-                <h4>Downvote Pool</h4>
-                <p>Total Shares: ${downvoteInfo.totalShares.toString()}</p>
-                <p>Your Shares: ${downvoteShares.toString()}</p>
-                <p>Total Deposited: ${ethers.utils.formatUnits(downvoteInfo.totalDeposited, 18)} REACT</p>
-            </div>
+        // Stats display for upvote pool
+        const upvoteStatsHTML = document.createElement('span');
+        upvoteStatsHTML.innerHTML = `
+            <p>Total Shares: ${upvoteInfo.totalShares.toString()}</p>
+            <p>Your Shares: ${upvoteShares.toString()}</p>
         `;
 
-        // Append the pool stats to the reactOptionsHTML
-        reactOptionsHTML.appendChild(poolStatsHTML);
+        // Stats display for downvote pool
+        const downvoteStatsHTML = document.createElement('span');
+        downvoteStatsHTML.innerHTML = `
+            <p>Total Shares: ${downvoteInfo.totalShares.toString()}</p>
+            <p>Your Shares: ${downvoteShares.toString()}</p>
+        `;
+
+        // Append buttons and stats to their respective containers
+        upvoteContainer.appendChild(upvoteButton);
+        upvoteContainer.appendChild(upvoteStatsHTML);
+        downvoteContainer.appendChild(downvoteButton);
+        downvoteContainer.appendChild(downvoteStatsHTML);
+
+        // Append containers to reactOptionsHTML
+        reactOptionsHTML.appendChild(upvoteContainer);
+        reactOptionsHTML.appendChild(downvoteContainer);
 
         // Append the entire reactOptionsHTML to the postElement
         postElement.appendChild(reactOptionsHTML);
@@ -2031,6 +2045,7 @@ async function attachReactOptionsToPost(postId, postElement, account) {
         console.error('Error attaching react options:', error);
     }
 }
+
 
 async function getAuthorNameByPostID(postId) {
     try {
@@ -2074,4 +2089,79 @@ async function followUser(userToFollowAddress) {
     } catch (error) {
         console.error('Error following user:', error);
     }
+}
+
+async function checkAndDisplayRegistration(userAddress) {
+	console.log(userAddress);
+    try {
+        const userInfo = await userContract.getUserInfo(userAddress);
+		console.log(userInfo);
+        // Assuming an empty username indicates the user is not registered
+        if (!userInfo || userInfo.username === '') {
+            displayRegistrationSection();
+        } else {
+            console.log(`${userAddress} is already registered.`);
+            // Optionally, update UI to reflect the user is already registered
+        }
+    } catch (error) {
+        console.error('Error checking registration status:', error);
+    }
+}
+
+function displayRegistrationSection() {
+    const tweetBox = document.getElementById('tweetBox');
+    tweetBox.innerHTML = `
+        <form id="registerForm">
+            <div class="tweetbox__input">
+                <input type="text" placeholder="Username" id="registerUsernameInput" />
+                <button class="tweetBox__tweetButton" id="registerSubmitButton">Register</button>
+            </div>
+        </form>
+    `;
+
+    document.getElementById('registerSubmitButton').addEventListener('click', async (e) => {
+        e.preventDefault();
+        const username = document.getElementById('registerUsernameInput').value;
+        await registerUser(username);
+    });
+}
+
+
+async function registerUser(username) {
+    try {
+        // Ensure username input is not empty
+        if (username.trim() === '') {
+            alert('Username cannot be empty.');
+            return;
+        }
+        
+        const tx = await userContract.registerUser(username);
+        await tx.wait(); // Wait for the transaction to be mined
+        console.log('Registration successful');
+        // Once registration is successful, revert to the original tweet box layout
+        revertToTweetBox();
+    } catch (error) {
+        console.error('Registration failed:', error);
+    }
+}
+
+function revertToTweetBox() {
+    const tweetBox = document.getElementById('tweetBox');
+    tweetBox.innerHTML = `
+        <form id="tweetForm">
+          <div class="tweetbox__input" id="tweetInput">
+            <img
+              src="https://i.pinimg.com/originals/a6/58/32/a65832155622ac173337874f02b218fb.png"
+              alt=""
+              id="userInputAvatar"
+            />
+            <input type="text" placeholder="What's happening?" id="tweetTextInput" />
+            <button type="button" id="addImageButton">Add Image</button>
+            <button type="button" id="generateImageButton">Generate</button>
+          </div>
+          <button class="tweetBox__tweetButton" id="tweetSubmitButton">Post</button>
+        </form>
+    `;
+	init();
+    // Reattach any necessary event listeners to the tweet box form elements
 }

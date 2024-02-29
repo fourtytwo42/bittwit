@@ -103,6 +103,11 @@ button:hover {
   width: 100%;
 }
 
+.follow-btn {
+margin: 0;
+
+}
+
 .feed {
   flex: 0.5; /* Adjust this value as needed */
   border-right: 1px solid var(--twitter-background);
@@ -146,9 +151,9 @@ button:hover {
 .react-options {
   display: flex;
   flex-direction: column;
-
-  justify-content: center;
-  padding: 10px;
+    width: 400px;
+    justify-content: left;
+    padding: 45px;
 }
 
 .react-options button {
@@ -207,7 +212,7 @@ button:hover {
   font-weight: 900;
 
   border-radius: 30px;
-  width: 80px;
+  width: 100px;
   height: 40px;
   margin-top: 20px;
   margin-left: auto;
@@ -216,10 +221,7 @@ button:hover {
 .post {
   display: flex;
   flex-direction: row;
-  align-items: flex-start;
-  border-bottom: 1px solid var(--twitter-background);
-  padding-bottom: 10px;
-  margin-top: 20px;
+
 }
 
 .post__left, .post__right {
@@ -230,6 +232,7 @@ button:hover {
 
 .post__user-info {
   display: flex;
+  width: 150px;
   align-items: center;
   margin-bottom: 10px;
 }
@@ -255,26 +258,7 @@ button:hover {
   border-radius: 8px;
 }
 
-.react-options {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start; /* Align items to the start for a larger area */
-  width: 100%; /* Ensure react options utilize the full area */
-}
 
-.react-options button {
-  background-color: var(--twitter-color);
-  color: white;
-  padding: 10px 20px; /* Increased padding for larger buttons */
-  margin: 10px; /* Increased margin for spacing */
-  border: none;
-  border-radius: 15px;
-  cursor: pointer;
-}
-
-.react-options button:hover {
-  background-color: #005f73;
-}
 
 .pool-info {
   margin-top: 20px; /* Increased margin-top for more spacing */
