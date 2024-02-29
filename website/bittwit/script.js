@@ -1630,6 +1630,13 @@ function handleImageUpload(event) {
 async function handleImageGeneration() {
     const desc = imagePrompt.value.trim();
     if (desc) {
+        // Check if the user is registered and has a username
+        const userInfo = await userContract.getUserInfo(userAccount);
+        if (!userInfo || userInfo.username === '') {
+            alert('You need to register and set a username before generating images.');
+            return;
+        }
+
         // Display loading.gif while waiting for the image to generate
         imagePlaceholder.src = 'loading.gif'; // Update the path if necessary
         imagePlaceholder.style.display = 'block';
@@ -1650,7 +1657,6 @@ async function handleImageGeneration() {
         console.log('Please enter a prompt for the image.');
     }
 }
-
 
 async function generateImageBlob(desc) {
     // Your API endpoint to generate images
@@ -1932,25 +1938,7 @@ async function followUserAsync(postId) {
         console.error('Error following user:', error);
     }
 }
-/*
-async function addReactOptionsToPost(postId, postElement, account) {
-    const poolInfo = await reactLiquidityPoolContract.getPoolInfo(postId, 1); // Example for one react type
-    const userShares = await reactLiquidityPoolContract.getUserShares(postId, 1, account);
 
-    const reactOptionsHTML = document.createElement('div');
-    reactOptionsHTML.classList.add('react-options');
-    reactOptionsHTML.innerHTML = `
-        <button onclick="reactToPost(${postId}, 1)">Upvote</button>
-        <button onclick="reactToPost(${postId}, 0)">Downvote</button>
-        <div class="pool-info">
-            <p>Total Shares: ${poolInfo.totalShares.toString()}</p>
-            <p>Your Shares: ${userShares.toString()}</p>
-        </div>
-    `;
-
-    postElement.querySelector('.post__right').appendChild(reactOptionsHTML);
-}
-*/
 
 async function updatePoolInfo(postId, account) {
     try {

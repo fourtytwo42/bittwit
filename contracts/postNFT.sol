@@ -23,6 +23,7 @@ contract PostNFT is ERC721URIStorage, Ownable(msg.sender) {
     UserManagement private userManagement;
 
     event PostCreated(uint256 indexed postId, address indexed author, uint256 createdAt);
+    event PostURIUpdated(uint256 indexed postId, string newURI); // Declare the event
 
     constructor(address userManagementAddress) ERC721("PostNFT", "PNFT") {
         userManagement = UserManagement(userManagementAddress);
@@ -68,4 +69,19 @@ contract PostNFT is ERC721URIStorage, Ownable(msg.sender) {
     function getTotalPosts() public view returns (uint256) {
         return _postIds.current();
     }
+
+    function clearPostURI(uint256 postId) public {
+        // Replace _isApprovedOrOwner with a check that combines ownerOf, getApproved, and isApprovedForAll
+        require(
+            ownerOf(postId) == msg.sender || 
+            getApproved(postId) == msg.sender || 
+            isApprovedForAll(ownerOf(postId), msg.sender) || 
+            owner() == msg.sender, 
+            "Caller is not owner nor approved"
+        );
+
+        _setTokenURI(postId, "");
+        emit PostURIUpdated(postId, ""); // This will work now since the event is declared
+    }
+
 }
