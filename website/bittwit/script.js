@@ -1357,7 +1357,7 @@ async function init() {
             if (account) {
                 initContracts();
                 await displayUserInfo(account);
-                await displayUserPosts(account);
+                await displayFriendsPosts(account);
                 ethereum.on('accountsChanged', handleAccountsChanged);
             }
         });
@@ -1366,7 +1366,7 @@ async function init() {
         if (account) {
             initContracts();
             await displayUserInfo(account);
-            await displayUserPosts(account);
+            await displayFriendsPosts(account);
             ethereum.on('accountsChanged', handleAccountsChanged);
         }
     } else {
@@ -1465,7 +1465,7 @@ async function displayUserInfo(address) {
         console.error('Error fetching user info:', error);
     }
 }
-async function displayLatestPosts() {
+async function displayLatestPosts(userAccount) {
     try {
         // Clear the post feed before adding new posts
         postFeed.innerHTML = '';
@@ -1530,7 +1530,7 @@ async function displayFriendsPosts(address) {
                             const userAvatar = metadata.image; // Placeholder, adjust as necessary
                             const postElement = createPostElement(metadata, post[3], postId, username, userAvatar);
                             postFeed.appendChild(postElement);
-                            attachReactOptionsToPost(postId, postElement, post[1]); // Assuming post[1] is the author's address
+                            attachReactOptionsToPost(postId, postElement, address); // Assuming post[1] is the author's address
                             roundDisplayed++;
                         }
                     }
@@ -1779,7 +1779,7 @@ async function handleAccountsChanged(accounts) {
         const account = accounts[0];
         console.log(`Account changed to: ${account}`);
         await displayUserInfo(account);
-        await displayUserPosts(account);
+        await displayFriendsPosts(account);
     }
 }
 
@@ -1991,6 +1991,8 @@ async function attachReactOptionsToPost(postId, postElement, account) {
         const upvoteInfo = await reactLiquidityPoolContract.getPoolInfo(postId, 1);
         const downvoteInfo = await reactLiquidityPoolContract.getPoolInfo(postId, 0);
         const upvoteShares = await reactLiquidityPoolContract.getUserShares(postId, 1, account);
+		console.log("postID: " + postId);
+		console.log("upvote: " + upvoteShares.toString() + "account: " + account);
         const downvoteShares = await reactLiquidityPoolContract.getUserShares(postId, 0, account);
 
         // Create a container for the react options and pool stats
@@ -2014,15 +2016,15 @@ async function attachReactOptionsToPost(postId, postElement, account) {
         // Stats display for upvote pool
         const upvoteStatsHTML = document.createElement('span');
         upvoteStatsHTML.innerHTML = `
-            <p>Total Shares: ${upvoteInfo.totalShares.toString()}</p>
-            <p>Your Shares: ${upvoteShares.toString()}</p>
+            <p>Total Shares: ${(upvoteInfo.totalShares / Math.pow(10, 18)).toFixed(2)}</p>
+            <p>Your Shares: ${(upvoteShares / Math.pow(10, 18)).toFixed(2)}</p>
         `;
 
         // Stats display for downvote pool
         const downvoteStatsHTML = document.createElement('span');
         downvoteStatsHTML.innerHTML = `
-            <p>Total Shares: ${downvoteInfo.totalShares.toString()}</p>
-            <p>Your Shares: ${downvoteShares.toString()}</p>
+            <p>Total Shares: ${(downvoteInfo.totalShares / Math.pow(10, 18)).toFixed(2)}</p>
+            <p>Your Shares: ${(downvoteShares / Math.pow(10, 18)).toFixed(2)}</p>
         `;
 
         // Append buttons and stats to their respective containers
