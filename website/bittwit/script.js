@@ -1292,6 +1292,166 @@ const postNftABI = [
 	}
 ];
 
+faucetABI = [
+	{
+		"inputs": [
+			{
+				"internalType": "contract IERC20",
+				"name": "_token",
+				"type": "address"
+			}
+		],
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "owner",
+				"type": "address"
+			}
+		],
+		"name": "OwnableInvalidOwner",
+		"type": "error"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "account",
+				"type": "address"
+			}
+		],
+		"name": "OwnableUnauthorizedAccount",
+		"type": "error"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "previousOwner",
+				"type": "address"
+			},
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "newOwner",
+				"type": "address"
+			}
+		],
+		"name": "OwnershipTransferred",
+		"type": "event"
+	},
+	{
+		"inputs": [],
+		"name": "TIME_LOCK",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "TOKEN_AMOUNT",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "claimTokens",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"name": "lastClaimTime",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "owner",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "renounceOwnership",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "token",
+		"outputs": [
+			{
+				"internalType": "contract IERC20",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "newOwner",
+				"type": "address"
+			}
+		],
+		"name": "transferOwnership",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "withdraw",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	}
+];
+
 const erc20ABI = [
     // Simplified ABI for brevity; include only the functions you need
     {
@@ -1319,8 +1479,11 @@ const erc20ABI = [
 
 const userManAddress = '0xc6c0454Ae2c503A59475414F52E626Dd69774DDC';
 const postNftAddress = '0x1fa47a6DE7cb2e25201586ceC0e904fd5F86e92F';
-const reactLiquidityPoolAddress = '0x70fFc9168F48228C6b662bbbF839abbC95F7AbC4';
+const reactLiquidityPoolAddress = '0x9d891B8ba4E5aF4216B8B23aD515300f4DA77288';
 const reactTokenAddress = '0xd9941136c56C5Bb64e3ab63e4Def6a4142c0654A';
+const faucetAddress = '0x533b4c751c8231b3eb43f963C963e8FD4f442d40';
+
+
 
 const ethereumButton = document.querySelector('#connectButton');
 const userAvatar = document.querySelector('#userAvatar');
@@ -1440,6 +1603,7 @@ function initContracts() {
     const signer = provider.getSigner();
     userContract = new ethers.Contract(userManAddress, userManABI, signer);
     postNftContract = new ethers.Contract(postNftAddress, postNftABI, signer);
+    faucetContract = new ethers.Contract(faucetAddress, faucetABI, signer);
     reactLiquidityPoolContract = new ethers.Contract(reactLiquidityPoolAddress, reactLiquidityPoolABI, signer);
     console.log('Contracts initialized.');
 	checkAndDisplayRegistration(userAccount);
@@ -1979,9 +2143,10 @@ async function attachReactOptionsToPost(postId, postElement, account) {
         const upvoteInfo = await reactLiquidityPoolContract.getPoolInfo(postId, 1);
         const downvoteInfo = await reactLiquidityPoolContract.getPoolInfo(postId, 0);
         const upvoteShares = await reactLiquidityPoolContract.getUserShares(postId, 1, account);
-		console.log("postID: " + postId);
-		console.log("upvote: " + upvoteShares.toString() + "account: " + account);
         const downvoteShares = await reactLiquidityPoolContract.getUserShares(postId, 0, account);
+
+        console.log("postID: " + postId);
+        console.log("upvote: " + upvoteShares.toString() + " account: " + account);
 
         // Create a container for the react options and pool stats
         const reactOptionsHTML = document.createElement('div');
@@ -1995,24 +2160,32 @@ async function attachReactOptionsToPost(postId, postElement, account) {
 
         // Create buttons with unique IDs using postId to ensure uniqueness
         const upvoteButton = document.createElement('button');
-        upvoteButton.textContent = 'Upvote';
+        upvoteButton.textContent = '↑ Upvote';
         upvoteButton.id = `upvote-${postId}`;
         const downvoteButton = document.createElement('button');
-        downvoteButton.textContent = 'Downvote';
+        downvoteButton.textContent = '↓ Downvote';
         downvoteButton.id = `downvote-${postId}`;
+
+        // Create a Withdraw button
+        const withdrawButton = document.createElement('button');
+        withdrawButton.textContent = 'Withdraw';
+        withdrawButton.id = `withdraw-${postId}`;
+        withdrawButton.classList.add('withdraw-button'); // Add class for styling
 
         // Stats display for upvote pool
         const upvoteStatsHTML = document.createElement('span');
         upvoteStatsHTML.innerHTML = `
-            <p>Total Shares: ${(upvoteInfo.totalShares / Math.pow(10, 18)).toFixed(2)}</p>
+            <p>Total Shares: ${(upvoteInfo[0] / Math.pow(10, 18)).toFixed(2)}</p>
             <p>Your Shares: ${(upvoteShares / Math.pow(10, 18)).toFixed(2)}</p>
+            <p>Total REACT: ${(upvoteInfo[1] / Math.pow(10, 18)).toFixed(2)}</p>
         `;
 
         // Stats display for downvote pool
         const downvoteStatsHTML = document.createElement('span');
         downvoteStatsHTML.innerHTML = `
-            <p>Total Shares: ${(downvoteInfo.totalShares / Math.pow(10, 18)).toFixed(2)}</p>
+            <p>Total Shares: ${(downvoteInfo[0] / Math.pow(10, 18)).toFixed(2)}</p>
             <p>Your Shares: ${(downvoteShares / Math.pow(10, 18)).toFixed(2)}</p>
+            <p>Total REACT: ${(downvoteInfo[1] / Math.pow(10, 18)).toFixed(2)}</p>
         `;
 
         // Append buttons and stats to their respective containers
@@ -2024,6 +2197,7 @@ async function attachReactOptionsToPost(postId, postElement, account) {
         // Append containers to reactOptionsHTML
         reactOptionsHTML.appendChild(upvoteContainer);
         reactOptionsHTML.appendChild(downvoteContainer);
+        reactOptionsHTML.appendChild(withdrawButton); // Append the Withdraw button
 
         // Append the entire reactOptionsHTML to the postElement
         postElement.appendChild(reactOptionsHTML);
@@ -2031,10 +2205,12 @@ async function attachReactOptionsToPost(postId, postElement, account) {
         // Attach event listeners after elements are added to the DOM
         document.getElementById(`upvote-${postId}`).addEventListener('click', () => reactToPost(postId, 1));
         document.getElementById(`downvote-${postId}`).addEventListener('click', () => reactToPost(postId, 0));
+        document.getElementById(`withdraw-${postId}`).addEventListener('click', () => withdrawReact(postId, account));
     } catch (error) {
         console.error('Error attaching react options:', error);
     }
 }
+
 
 
 async function getAuthorNameByPostID(postId) {
@@ -2154,4 +2330,22 @@ function revertToTweetBox() {
     `;
 	init();
     // Reattach any necessary event listeners to the tweet box form elements
+}
+
+
+async function reactFaucet() {
+  try {
+    // Call the claimTokens function
+    const tx = await faucetContract.claimTokens();
+    console.log('Transaction sent:', tx);
+
+    // Wait for the transaction to be mined/confirmed
+    const receipt = await tx.wait();
+    console.log('Transaction confirmed:', receipt);
+
+    // Optionally, handle the receipt, e.g., to confirm tokens were claimed or to update the UI
+  } catch (error) {
+    console.error('Error claiming tokens:', error);
+    // Handle errors, e.g., user rejected the transaction, network error, etc.
+  }
 }

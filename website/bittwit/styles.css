@@ -99,7 +99,6 @@ button:hover {
   color: white;
   font-weight: 900;
   border-radius: 30px;
-  height: 50px;
   width: 100%;
 }
 
@@ -151,13 +150,14 @@ margin: 0;
 .react-options {
   display: flex;
   flex-direction: column;
-    width: 400px;
+  width: 30%;
     justify-content: left;
-    padding: 45px;
+    padding-top: 60px;
 }
 
 .react-options button {
-  margin: 5px;
+  margin-top: 15px;
+  width: 100px;
   padding: 5px 10px;
   background-color: var(--twitter-color);
   color: white;
@@ -167,7 +167,7 @@ margin: 0;
 }
 
 .react-options button:hover {
-  background-color: darken(var(--twitter-color), 10%);
+  background-color: #005f73;
 }
 
 /* General pool info styling */
@@ -227,14 +227,14 @@ margin: 0;
 .post__left, .post__right {
   display: flex;
   flex-direction: column;
-  width: 50%; /* Adjusted to make left and right sides equal */
+  width: 30%; /* Adjusted to make left and right sides equal */
 }
 
 .post__user-info {
   display: flex;
-  width: 150px;
+
   align-items: center;
-  margin-bottom: 10px;
+
 }
 
 .post__avatar {
@@ -290,4 +290,13 @@ margin: 0;
 
 #generateButton {
   white-space: nowrap; /* Prevents text wrapping in the button */
+}
+
+#faucetButton {
+	background-color: green;
+}
+
+.withdraw-button {
+background-color: green !important;
+margin-top:50px !important;
 }

@@ -55,18 +55,24 @@ function calculateShares(uint256 nftId, uint256 reactSubId, uint256 amount) publ
     NFTPool storage nftPool = nftPools[nftId];
     Pool storage pool = nftPool.reacts[reactSubId];
     
-    // Instead of checking if pool.totalDeposited > 0, check if the pool's startBlock has been set.
-    // This check will be true for all subsequent deposits after the first one.
+    // Ensure the pool has been initialized
     require(pool.startBlock > 0 || pool.totalDeposited == 0, "Pool has not been initialized or error in pool setup.");
 
-    uint256 halvings = pool.startBlock > 0 ? (block.number - pool.startBlock) / BLOCKS_PER_HALVING : 0;
+    // Calculate the number of hours since the pool started
+    uint256 blocksSinceStart = block.number - pool.startBlock;
+    uint256 BLOCKS_PER_HOUR = 3600 / 60; // Assuming a block time of ~13 seconds
+    uint256 hoursSinceStart = blocksSinceStart / BLOCKS_PER_HOUR;
+
     uint256 initialShares = amount * 2; // Initial shares doubled for simplicity
 
-    // Adjust shares based on how many halvings have occurred since the pool started
-    uint256 adjustedShares = initialShares >> halvings; // Equivalent to dividing by 2^halvings
+    // Adjust shares based on a 10% reduction for each hour since the pool started
+    for (uint256 i = 0; i < hoursSinceStart; i++) {
+        initialShares = (initialShares * 9) / 10; // Decrease shares by 10% per hour
+    }
 
-    return adjustedShares;
+    return initialShares;
 }
+
 
 
     function withdraw(uint256 nftId, uint256 reactSubId) external {
