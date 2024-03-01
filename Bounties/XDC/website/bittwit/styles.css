@@ -1,0 +1,302 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  --twitter-color: #50b7f5;
+  --twitter-background: #e6ecf0;
+  display: flex;
+  height: 100vh;
+  margin-left: auto;
+  margin-right: auto;
+  font-family: Arial, sans-serif;
+}
+
+header {
+  background-color: #333;
+  color: #fff;
+  padding: 10px 0;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  z-index: 1000;
+}
+
+#userProfile {
+  display: flex;
+  gap: 10px;
+}
+
+#userAvatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+#userName {
+  color: #fff;
+  font-size: 16px;
+}
+
+button {
+  background-color: #008cba;
+  color: white;
+  padding: 8px 16px;
+  margin: 10px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+button:hover {
+  background-color: #005f73;
+}
+
+.sidebar {
+  border-right: 1px solid var(--twitter-background);
+  flex: 0.2;
+  min-width: 250px;
+  margin-top: 20px;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.sidebarOption {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.sidebarOption .material-icons,
+.fa-twitter {
+  padding: 20px;
+}
+
+.sidebarOption h2 {
+  font-weight: 800;
+  font-size: 20px;
+  margin-right: 20px;
+}
+
+.sidebarOption:hover {
+  background-color: var(--twitter-background);
+  border-radius: 30px;
+  color: var(--twitter-color);
+  transition: color 100ms ease-out;
+}
+
+.sidebarOption.active,
+.sidebar__tweet {
+  color: var(--twitter-color);
+  background-color: var(--twitter-color);
+  border: none;
+  color: white;
+  font-weight: 900;
+  border-radius: 30px;
+  width: 100%;
+}
+
+.follow-btn {
+margin: 0;
+
+}
+
+.feed {
+  flex: 0.5; /* Adjust this value as needed */
+  border-right: 1px solid var(--twitter-background);
+  min-width: fit-content;
+  max-width: 40%; /* Adjusted from 60% to make the feed narrower */
+  overflow-y: scroll;
+}
+
+.widgets {
+  flex: 0.5; /* Adjust this value as needed */
+  border-right: 1px solid var(--twitter-background);
+  min-width: fit-content;
+  max-width: 25%; /* Adjusted from 60% to make the feed narrower */
+
+}
+
+
+.feed__header {
+  position: sticky;
+  top: 0;
+  background-color: white;
+  z-index: 100;
+  border: 1px solid var(--twitter-background);
+  padding: 15px 20px;
+}
+
+.feed__header h2 {
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.feed::-webkit-scrollbar,
+.feed {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+
+
+/* React options styling */
+.react-options {
+  display: flex;
+  flex-direction: column;
+  width: 30%;
+    justify-content: left;
+    padding-top: 60px;
+}
+
+.react-options button {
+  margin-top: 15px;
+  width: 100px;
+  padding: 5px 10px;
+  background-color: var(--twitter-color);
+  color: white;
+  border: none;
+  border-radius: 15px;
+  cursor: pointer;
+}
+
+.react-options button:hover {
+  background-color: #005f73;
+}
+
+/* General pool info styling */
+.pool-info {
+  margin-top: 10px;
+}
+
+/* tweet box */
+.tweetbox__input img {
+  border-radius: 50%;
+  height: 40px;
+}
+
+.tweetBox {
+  padding-bottom: 10px;
+  border-bottom: 8px solid var(--twitter-background);
+  padding-right: 10px;
+}
+
+.tweetBox form {
+  display: flex;
+  flex-direction: column;
+}
+
+.tweetbox__input {
+  display: flex;
+  padding: 20px;
+}
+
+.tweetbox__input input {
+  flex: 1;
+  margin-left: 20px;
+  font-size: 20px;
+  border: none;
+  outline: none;
+}
+
+.tweetBox__tweetButton {
+  background-color: var(--twitter-color);
+  border: none;
+  color: white;
+  font-weight: 900;
+
+  border-radius: 30px;
+  width: 100px;
+  height: 40px;
+  margin-top: 20px;
+  margin-left: auto;
+}
+
+.post {
+  display: flex;
+  flex-direction: row;
+
+}
+
+.post__left, .post__right {
+  display: flex;
+  flex-direction: column;
+  width: 30%; /* Adjusted to make left and right sides equal */
+}
+
+.post__user-info {
+  display: flex;
+
+  align-items: center;
+
+}
+
+.post__avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 10px;
+}
+
+.post__content {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 10px;
+}
+
+.post__image {
+  width: 256px;
+  height: auto;
+  margin-top: 10px;
+  border-radius: 8px;
+}
+
+
+
+.pool-info {
+  margin-top: 20px; /* Increased margin-top for more spacing */
+}
+
+#imagePlaceholder {
+    width: 512px;
+    margin-top: 18px;
+}
+
+#imageGeneratorContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 50px; /* Adjust as needed */
+}
+
+.imageGeneratorControls {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: 10px; /* Adjust as needed */
+}
+
+#imagePrompt {
+  flex-grow: 1; /* Ensures the input takes up available space */
+  margin-right: 10px; /* Spacing between input and button */
+}
+
+#generateButton {
+  white-space: nowrap; /* Prevents text wrapping in the button */
+}
+
+#faucetButton {
+	background-color: green;
+}
+
+.withdraw-button {
+background-color: green !important;
+margin-top:50px !important;
+}

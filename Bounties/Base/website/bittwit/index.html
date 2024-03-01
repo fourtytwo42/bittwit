@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Silverbacks Lounge</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+      integrity="sha512-iBBXm8fW90+nuLcSKlbmrPcLa0OT92xO1BIsZ+ywDWZCvqsWgccV3gFoRBv0z+8dLJgyAHIhR35VZc2oM/gI1w=="
+      crossorigin="anonymous"
+    />
+    <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js" type="application/javascript"></script>
+    <script src="script.js" defer></script>
+</head>
+<body>
+    <header>
+        <div id="userProfile">
+            <span id="userName">Username</span>
+        </div>
+        <button id="connectButton">Connect to MetaMask</button>
+    </header>
+
+    <div class="sidebar" id="sidebar">
+      <i class="fab fa-twitter" id="twitterIcon"></i>
+      <div class="sidebarOption" id="homeOption">
+        
+      </div>
+	  <button class="sidebar__tweet"  Onclick="displayFriendsPosts(userAccount)"><span class="material-icons"> home </span></button>
+	  <button class="sidebar__tweet" id="profileButton" Onclick="displayUserPosts(userAccount)">Profile</button>
+	  <button class="sidebar__tweet" id="discoverButton"Onclick="displayLatestPosts(userAccount)" >Discover</button>
+	  <button class="sidebar__tweet" id="faucetButton" Onclick="reactFaucet()" >REACT Faucet</button>
+    </div>
+
+    <div class="feed" id="feed">
+      <div class="feed__header" id="feedHeader">
+        <h2>Home</h2>
+      </div>
+
+      <div class="tweetBox" id="tweetBox">
+        <form id="tweetForm">
+          <div class="tweetbox__input" id="tweetInput">
+            <img
+              src="https://i.pinimg.com/originals/a6/58/32/a65832155622ac173337874f02b218fb.png"
+              alt=""
+              id="userInputAvatar"
+            />
+            <input type="text" placeholder="What's happening?" id="tweetTextInput" />
+            <button type="button" id="addImageButton">Add Image</button>
+            <button type="button" id="generateImageButton">Generate</button>
+          </div>
+          <button class="tweetBox__tweetButton" id="tweetSubmitButton">Post</button>
+        </form>
+      </div>
+
+      <div id="postFeed"></div>
+    </div>
+
+    <div class="widgets" id="widgets">
+      <div class="widgets__input" id="widgetsInput">
+        <span class="material-icons widgets__searchIcon"> search </span>
+        <input type="text" placeholder="Search Twitter" id="searchInput" />
+      </div>
+
+      <div class="widgets__widgetContainer" id="widgetContainer">
+
+        <div id="imageGeneratorContainer" style="display: none;">
+  <img id="imagePlaceholder" src="placeholder.jpg" alt="Generated Image" style="max-width: 100%;">
+  <div class="imageGeneratorControls">
+    <input type="text" id="imagePrompt" placeholder="Enter prompt for image generation">
+    <button id="generateButton">Generate</button>
+  </div>
+</div>
+        <input type="file" id="imageUpload" style="display: none;">
+        <img id="uploadPreview" style="max-width: 100%; display: none;">
+      </div>
+    </div>
+</body>
+</html>
