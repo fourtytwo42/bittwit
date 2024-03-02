@@ -1520,7 +1520,7 @@ async function init() {
             if (account) {
                 initContracts();
                 await displayUserInfo(account);
-                await displayFriendsPosts(account);
+                await displayLatestPosts(account);
                 ethereum.on('accountsChanged', handleAccountsChanged);
             }
         });
@@ -1529,7 +1529,7 @@ async function init() {
         if (account) {
             initContracts();
             await displayUserInfo(account);
-            await displayFriendsPosts(account);
+            await displayLatestPosts(account);
             ethereum.on('accountsChanged', handleAccountsChanged);
         }
     } else {
